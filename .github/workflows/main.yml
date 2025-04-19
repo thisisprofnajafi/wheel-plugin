@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -18,7 +22,7 @@ jobs:
           username: prof@studentsbme.com
           password: Prof48017421@#
           server-dir: /
-          local-dir: ./ # Specify the local directory to sync
+          local-dir: ./
 
       - name: Debug Output
         run: |
