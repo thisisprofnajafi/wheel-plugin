@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-    
 
 jobs:
   deploy:
@@ -19,6 +18,11 @@ jobs:
           username: prof@studentsbme.com
           password: Prof48017421@#
           server-dir: /
+          local-dir: ./ # Specify the local directory to sync
+
+      - name: Debug Output
+        run: |
+          echo "Files should have been transferred. Check the FTP server for updates."
 
       - name: Notify Telegram
         env:
