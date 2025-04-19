@@ -12,6 +12,7 @@ class Wheel_Manager_BME_Admin {
         add_action('admin_init', array($this, 'register_settings'));
     }
 
+    
     public function add_admin_menu() {
         add_menu_page(
             __('Wheel Manager BME', 'wheel-manager-bme'),
