@@ -1,0 +1,197 @@
+.wheel-manager-dashboard {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.wheel-manager-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.wheel-manager-header h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 700;
+}
+
+.wheel-manager-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stats-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+}
+
+.stats-content h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.stats-value {
+    margin: 0.5rem 0 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.wheel-manager-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.convert-points-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.convert-points-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.wheel-manager-wheel-section {
+    text-align: center;
+    margin: 3rem 0;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.wheel-manager-history {
+    margin-top: 3rem;
+}
+
+.wheel-manager-history h2 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-points {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #27ae60;
+    min-width: 80px;
+}
+
+.activity-points:not([data-points^="+"]){
+    color: #e74c3c;
+}
+
+.activity-type {
+    flex: 1;
+    margin: 0 1rem;
+    color: #2c3e50;
+}
+
+.activity-date {
+    color: #95a5a6;
+    font-size: 0.9rem;
+}
+
+.wheel-manager-footer {
+    margin-top: 4rem;
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.wheel-manager-footer p {
+    color: #95a5a6;
+    font-size: 0.9rem;
+}
+
+.wheel-manager-footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.wheel-manager-footer a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+.wheel-manager-login-required {
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .wheel-manager-dashboard {
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    .wheel-manager-header h1 {
+        font-size: 2rem;
+    }
+
+    .stats-card {
+        padding: 1rem;
+    }
+
+    .stats-value {
+        font-size: 1.5rem;
+    }
+
+    .convert-points-btn {
+        font-size: 0.8rem;
+        padding: 0.8rem;
+    }
+} 
