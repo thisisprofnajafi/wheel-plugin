@@ -1,7 +1,6 @@
-=== Wheel Manager BME ===
+=== مدیریت چرخ BME ===
 Contributors: abolfazlnajafi
-Donate link: https://abolfazlnajafi.com/donate
-Tags: wheel, points, rewards, mycred, woocommerce
+Tags: mycred, wheel of fortune, points, rewards, gamification
 Requires at least: 5.8
 Tested up to: 6.4
 Requires PHP: 7.2
@@ -9,89 +8,109 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Integrate WP Optin Wheel with myCred points system and WooCommerce for a complete wheel-based rewards solution.
+ادغام سیستم امتیازدهی myCRED با چرخ شانس WP Optin Wheel برای ایجاد چرخش‌های مبتنی بر امتیاز و پاداش.
 
-== Description ==
+== توضیحات ==
 
-Wheel Manager BME is a powerful integration plugin that connects WP Optin Wheel with myCred points system and WooCommerce. It provides a complete solution for managing wheel spins, points, and rewards in your WordPress site.
+مدیریت چرخ BME یک پل ارتباطی یکپارچه بین سیستم امتیازدهی myCRED و چرخ شانس WP Optin Wheel ایجاد می‌کند. این ادغام به مدیران وب‌سایت امکان می‌دهد تجربه‌های جذاب چرخ مبتنی بر امتیاز برای کاربران خود ایجاد کنند.
 
-= Features =
+= ویژگی‌های کلیدی =
 
-* Automatic points award for WooCommerce purchases
-* Points to spins conversion system
-* Daily spin limits
-* Chance-based raffle code generation
-* Modern user dashboard
-* Detailed activity logging
-* Complete admin control panel
+* پیکربندی هزینه امتیاز برای چرخش‌های چرخ
+* اعطای امتیاز برای چرخش‌های برنده
+* نمایش موجودی امتیاز به صورت آنی
+* کسر و اعتبار خودکار امتیاز
+* رابط کاربری تمیز و مدرن
+* به‌روزرسانی‌های مبتنی بر AJAX
+* بدون شلوغی در پیشخوان مدیریت
 
-= Requirements =
+= چرخش چرخ بر اساس امتیاز =
 
-* WordPress 5.8 or higher
-* PHP 7.2 or higher
-* WooCommerce
-* myCred
-* WP Optin Wheel
+* تنظیم هزینه امتیاز سفارشی برای هر چرخش
+* چرخش فقط با امتیاز کافی امکان‌پذیر است
+* کسر خودکار امتیاز هنگام چرخش
+* به‌روزرسانی آنی موجودی
 
-== Installation ==
+= پاداش امتیازی =
 
-1. Upload the plugin files to the `/wp-content/plugins/wheel-manager-bme` directory, or install the plugin through the WordPress plugins screen directly.
-2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Configure the plugin settings through the 'Wheel Manager' menu item that appears in your admin menu.
-4. Set up your points values for different purchase amounts and activities.
+* تنظیم پاداش امتیازی اختیاری برای برنده‌ها
+* اعتبار خودکار امتیاز
+* مقادیر پاداش قابل تنظیم
+* نمایش واضح پاداش
 
-== Frequently Asked Questions ==
+= رابط کاربری =
 
-= How do users earn points? =
+* نمایش مدرن موجودی امتیاز
+* به‌روزرسانی خودکار هر 30 ثانیه
+* به‌روزرسانی فوری پس از چرخش
+* پیام‌های واضح برای امتیاز ناکافی
+* لینک‌های اطلاعات کسب امتیاز
 
-Users can earn points through:
-* WooCommerce purchases
-* Registration
-* Referrals
-* Profile completion
-* Other configurable activities
+== نصب ==
 
-= How does the points to spins conversion work? =
+1. پوشه `wheel-manager-bme` را در مسیر `/wp-content/plugins/` آپلود کنید
+2. افزونه را از طریق منوی 'افزونه‌ها' در وردپرس فعال کنید
+3. اطمینان حاصل کنید که هر دو افزونه myCRED و WP Optin Wheel نصب و فعال هستند
+4. هزینه امتیاز را در تنظیمات WP Optin Wheel پیکربندی کنید
 
-Users can convert their points to spins at the following rates:
-* 10 points = 1 spin
-* 50 points = 6 spins (20% bonus)
-* 100 points = 15 spins (50% bonus)
+== سوالات متداول ==
 
-== Screenshots ==
+= چه افزونه‌هایی مورد نیاز است؟ =
 
-1. User Dashboard
-2. Admin Settings
-3. Points Configuration
-4. Activity Log
+این افزونه نیاز به نصب و فعال‌سازی هر دو افزونه myCRED و WP Optin Wheel دارد.
 
-== Changelog ==
+= چگونه هزینه امتیاز را تنظیم کنم؟ =
+
+به تنظیمات WP Optin Wheel بروید و بخش جدید "تنظیمات امتیاز" را پیدا کنید که در آن می‌توانید هزینه‌ها و پاداش‌ها را تنظیم کنید.
+
+= آیا می‌توانم پاداش امتیازی را غیرفعال کنم؟ =
+
+بله، با تنظیم مقدار پاداش امتیازی روی 0، پاداش امتیازی برای چرخش‌های برنده غیرفعال می‌شود.
+
+= موجودی امتیاز هر چند وقت یکبار به‌روز می‌شود؟ =
+
+موجودی امتیاز به طور خودکار هر 30 ثانیه و بلافاصله پس از هر چرخش به‌روز می‌شود.
+
+= کجا می‌توانم تراکنش‌های امتیازی را ببینم؟ =
+
+تمام تراکنش‌های امتیازی در گزارش‌های myCRED با ارجاعات واضح به فعالیت‌های چرخ ثبت می‌شوند.
+
+== تصاویر ==
+
+1. نمایش موجودی امتیاز و هزینه
+2. تنظیمات چرخ با پیکربندی امتیاز
+3. پیام امتیاز ناکافی
+4. اعلان پاداش امتیازی
+
+== تغییرات ==
 
 = 1.0.0 =
-* Initial release
+* انتشار اولیه
+* سیستم هزینه و پاداش امتیازی
+* به‌روزرسانی‌های آنی
+* المان‌های رابط کاربری
+* ادغام با myCRED
+* سازگاری با WP Optin Wheel
 
-== Upgrade Notice ==
+== اطلاعیه به‌روزرسانی ==
 
 = 1.0.0 =
-Initial release of Wheel Manager BME.
+انتشار اولیه مدیریت چرخ BME. نیاز به افزونه‌های myCRED و WP Optin Wheel دارد.
 
-== Copyright ==
+== کپی‌رایت ==
 
-Wheel Manager BME, Copyright 2024 Abolfazl Najafi
-Wheel Manager BME is distributed under the terms of the GNU GPL
+مدیریت چرخ BME، کپی‌رایت 2024 ابوالفضل نجفی
+مدیریت چرخ BME تحت شرایط GNU GPL توزیع می‌شود
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
+این برنامه نرم‌افزار آزاد است: شما می‌توانید آن را تحت شرایط مجوز عمومی همگانی GNU منتشر شده توسط
+بنیاد نرم‌افزار آزاد، نسخه 2 یا (به اختیار شما) هر نسخه بعدی، توزیع مجدد و/یا اصلاح کنید.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+این برنامه با این امید توزیع می‌شود که مفید باشد،
+اما بدون هیچ ضمانتی؛ حتی بدون ضمانت ضمنی
+قابلیت فروش یا تناسب برای یک هدف خاص. برای جزئیات بیشتر
+به مجوز عمومی همگانی GNU مراجعه کنید.
 
-== Credits ==
+== اعتبارات ==
 
-* WP Optin Wheel integration based on MABEL_WOF_LITE
-* Uses myCred points system
-* Integrates with WooCommerce 
+* ادغام WP Optin Wheel بر اساس MABEL_WOF_LITE
+* استفاده از سیستم امتیازدهی myCred 

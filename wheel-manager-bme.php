@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Wheel Manager BME
  * Plugin URI: https://abolfazlnajafi.com/wheel-manager-bme
- * Description: Integration plugin for myCred and WP Optin Wheel with WooCommerce. Manage your wheel spins, points, and rewards system.
+ * Description: Integration plugin for myCred and WP Optin Wheel. Manage your wheel spins using myCred points system.
  * Version: 1.0.0
  * Requires at least: 5.8
  * Requires PHP: 7.2
@@ -14,18 +14,6 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  *
  * @package Wheel_Manager_BME
- * @author Abolfazl Najafi
- * @copyright 2024 Abolfazl Najafi
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
  */
 
 // Exit if accessed directly
@@ -41,10 +29,7 @@ define('WHEEL_MANAGER_BME_BASENAME', plugin_basename(__FILE__));
 
 class Wheel_Manager_BME {
     private static $instance = null;
-    private $admin;
-    private $woocommerce;
-    private $frontend;
-    private $wheel;
+    private $points_bridge;
 
     public static function get_instance() {
         if (null === self::$instance) {
@@ -63,36 +48,18 @@ class Wheel_Manager_BME {
 
     private function load_dependencies() {
         // Load required files
-        require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-wheel-manager-bme-activator.php';
-        require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-wheel-manager-bme-admin.php';
-        require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-wheel-manager-bme-woocommerce.php';
-        require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-wheel-manager-bme-frontend.php';
-        require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-wheel-manager-bme-wheel.php';
+        require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-wheel-manager-bme-points-bridge.php';
     }
 
     private function init() {
-        // Initialize admin
-        $this->admin = new Wheel_Manager_BME_Admin('wheel-manager-bme', WHEEL_MANAGER_BME_VERSION);
-
-        // Initialize frontend
-        $this->frontend = new Wheel_Manager_BME_Frontend('wheel-manager-bme', WHEEL_MANAGER_BME_VERSION);
-
-        // Initialize wheel integration
-        $this->wheel = new Wheel_Manager_BME_Wheel();
-
-        // Initialize WooCommerce integration if WooCommerce is active
-        if ($this->is_woocommerce_active()) {
-            $this->woocommerce = new Wheel_Manager_BME_WooCommerce();
-        }
+        // Initialize points bridge
+        $this->points_bridge = new Wheel_Manager_BME_Points_Bridge();
 
         // Add init hook
         add_action('init', array($this, 'init_plugin'));
 
         // Add plugin action links
         add_filter('plugin_action_links_' . WHEEL_MANAGER_BME_BASENAME, array($this, 'add_action_links'));
-
-        // Add plugin meta links
-        add_filter('plugin_row_meta', array($this, 'add_plugin_meta_links'), 10, 2);
     }
 
     public function activate() {
@@ -116,8 +83,6 @@ class Wheel_Manager_BME {
             );
         }
 
-        Wheel_Manager_BME_Activator::activate();
-
         // Flush rewrite rules
         flush_rewrite_rules();
     }
@@ -138,17 +103,9 @@ class Wheel_Manager_BME {
         }
     }
 
-    private function is_woocommerce_active() {
-        return in_array(
-            'woocommerce/woocommerce.php',
-            apply_filters('active_plugins', get_option('active_plugins'))
-        );
-    }
-
     private function check_required_plugins() {
         return class_exists('myCRED_Core') && 
-               class_exists('MABEL_WOF_LITE\\Wheel_Of_Fortune') && 
-               $this->is_woocommerce_active();
+               class_exists('MABEL_WOF_LITE\\Wheel_Of_Fortune');
     }
 
     public function admin_notice_missing_plugins() {
@@ -161,9 +118,6 @@ class Wheel_Manager_BME {
         if (!class_exists('MABEL_WOF_LITE\\Wheel_Of_Fortune')) {
             $missing[] = 'WP Optin Wheel';
         }
-        if (!$this->is_woocommerce_active()) {
-            $missing[] = 'WooCommerce';
-        }
 
         printf(
             '<div class="notice notice-error"><p>%s<strong>%s</strong></p></div>',
@@ -174,20 +128,9 @@ class Wheel_Manager_BME {
 
     public function add_action_links($links) {
         $plugin_links = array(
-            '<a href="' . admin_url('admin.php?page=wheel-manager-bme') . '">' . __('Settings', 'wheel-manager-bme') . '</a>'
+            '<a href="https://abolfazlnajafi.com/docs/wheel-manager-bme" target="_blank">' . __('Documentation', 'wheel-manager-bme') . '</a>'
         );
         return array_merge($plugin_links, $links);
-    }
-
-    public function add_plugin_meta_links($links, $file) {
-        if (WHEEL_MANAGER_BME_BASENAME === $file) {
-            $new_links = array(
-                '<a href="https://abolfazlnajafi.com/docs/wheel-manager-bme" target="_blank">' . __('Documentation', 'wheel-manager-bme') . '</a>',
-                '<a href="https://abolfazlnajafi.com/support" target="_blank">' . __('Support', 'wheel-manager-bme') . '</a>'
-            );
-            $links = array_merge($links, $new_links);
-        }
-        return $links;
     }
 }
 
