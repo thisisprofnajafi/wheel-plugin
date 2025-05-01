@@ -13,10 +13,14 @@ if (!defined('ABSPATH')) {
 class Wheel_Manager_BME_Points_Bridge {
     private $mycred;
     private $default_points_cost = 100;
+    private $points_history_table = 'wheel_points_history';
 
     public function __construct() {
         // Initialize myCRED
         $this->mycred = mycred();
+
+        // Create points history table
+        add_action('init', array($this, 'create_points_history_table'));
 
         // Add hooks
         add_filter('mabel_wof_lite_can_spin', array($this, 'check_points_for_spin'), 10, 2);
@@ -33,15 +37,81 @@ class Wheel_Manager_BME_Points_Bridge {
     }
 
     /**
+     * Create points history table
+     */
+    public function create_points_history_table() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . $this->points_history_table;
+        
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+            $charset_collate = $wpdb->get_charset_collate();
+            
+            $sql = "CREATE TABLE $table_name (
+                id bigint(20) NOT NULL AUTO_INCREMENT,
+                user_id bigint(20) NOT NULL,
+                points_used int(11) NOT NULL,
+                spin_count int(11) NOT NULL,
+                bonus_percentage int(11) NOT NULL,
+                created_at datetime NOT NULL,
+                PRIMARY KEY  (id),
+                KEY user_id (user_id)
+            ) $charset_collate;";
+            
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+        }
+    }
+
+    /**
+     * Get available spins based on points
+     */
+    private function get_available_spins($user_id) {
+        global $wpdb;
+        
+        // Get total points from myCRED
+        $total_points = $this->mycred->get_users_balance($user_id);
+        
+        // Get used points from history
+        $table_name = $wpdb->prefix . $this->points_history_table;
+        $used_points = $wpdb->get_var($wpdb->prepare(
+            "SELECT SUM(points_used) FROM $table_name WHERE user_id = %d",
+            $user_id
+        ));
+        
+        $available_points = $total_points - ($used_points ?: 0);
+        
+        // Calculate spins based on points
+        if ($available_points >= 100) {
+            return array(
+                'spins' => 15,
+                'bonus' => 50
+            );
+        } elseif ($available_points >= 50) {
+            return array(
+                'spins' => 6,
+                'bonus' => 20
+            );
+        } elseif ($available_points >= 10) {
+            return array(
+                'spins' => 1,
+                'bonus' => 0
+            );
+        }
+        
+        return array(
+            'spins' => 0,
+            'bonus' => 0
+        );
+    }
+
+    /**
      * Check if user has enough points to spin
      */
     public function check_points_for_spin($can_spin, $user_id) {
         if (!$user_id) return $can_spin;
 
-        $points_needed = $this->get_spin_cost();
-        $current_points = $this->mycred->get_users_balance($user_id);
-
-        return $can_spin && ($current_points >= $points_needed);
+        $available_spins = $this->get_available_spins($user_id);
+        return $can_spin && ($available_spins['spins'] > 0);
     }
 
     /**
@@ -50,13 +120,33 @@ class Wheel_Manager_BME_Points_Bridge {
     public function deduct_points_for_spin($wheel_id, $user_id) {
         if (!$user_id) return;
 
-        $points_needed = $this->get_spin_cost($wheel_id);
-        $this->mycred->subtract(
-            'wheel_spin',
-            $user_id,
-            $points_needed,
-            __('Wheel of Fortune spin', 'wheel-manager-bme'),
-            $wheel_id
+        $available_spins = $this->get_available_spins($user_id);
+        if ($available_spins['spins'] <= 0) return;
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . $this->points_history_table;
+        
+        // Calculate points to deduct based on available spins
+        $points_to_deduct = 0;
+        if ($available_spins['spins'] == 15) {
+            $points_to_deduct = 100;
+        } elseif ($available_spins['spins'] == 6) {
+            $points_to_deduct = 50;
+        } else {
+            $points_to_deduct = 10;
+        }
+
+        // Record the points usage
+        $wpdb->insert(
+            $table_name,
+            array(
+                'user_id' => $user_id,
+                'points_used' => $points_to_deduct,
+                'spin_count' => 1,
+                'bonus_percentage' => $available_spins['bonus'],
+                'created_at' => current_time('mysql')
+            ),
+            array('%d', '%d', '%d', '%d', '%s')
         );
     }
 
@@ -107,8 +197,22 @@ class Wheel_Manager_BME_Points_Bridge {
             return;
         }
 
-        $wheel_settings = get_post_meta($wheel_id, 'wof_settings', true);
-        include WHEEL_MANAGER_BME_PLUGIN_DIR . 'templates/points-info.php';
+        $user_id = get_current_user_id();
+        $available_spins = $this->get_available_spins($user_id);
+        
+        if ($available_spins['spins'] > 0) {
+            echo '<div class="wheel-points-info">';
+            echo sprintf(
+                __('You have %d spins available with %d%% bonus!', 'wheel-manager-bme'),
+                $available_spins['spins'],
+                $available_spins['bonus']
+            );
+            echo '</div>';
+        } else {
+            echo '<div class="wheel-points-info">';
+            echo __('You need more points to spin the wheel!', 'wheel-manager-bme');
+            echo '</div>';
+        }
     }
 
     /**

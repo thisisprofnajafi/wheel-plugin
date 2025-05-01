@@ -83,6 +83,11 @@ class Wheel_Manager_BME {
             );
         }
 
+        // Create points history table
+        global $wpdb;
+        $points_bridge = new Wheel_Manager_BME_Points_Bridge();
+        $points_bridge->create_points_history_table();
+
         // Flush rewrite rules
         flush_rewrite_rules();
     }
