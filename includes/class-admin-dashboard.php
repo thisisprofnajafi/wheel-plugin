@@ -640,6 +640,8 @@ class Wheel_Manager_BME_Admin_Dashboard {
         echo '<th>' . __('Total Points Won', 'wheel-manager-bme') . '</th>';
         echo '<th>' . __('Last Spin', 'wheel-manager-bme') . '</th>';
         echo '<th>' . __('Available Points', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('Points Deducted', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('Adjusted Points', 'wheel-manager-bme') . '</th>';
         echo '<th>' . __('Can Spin', 'wheel-manager-bme') . '</th>';
         echo '</tr>';
         echo '</thead>';
@@ -654,6 +656,8 @@ class Wheel_Manager_BME_Admin_Dashboard {
             echo '<td>' . esc_html($wheel_history['total_points_won']) . '</td>';
             echo '<td>' . esc_html($wheel_history['last_spin_time']) . '</td>';
             echo '<td>' . esc_html($wheel_history['available_points']) . '</td>';
+            echo '<td>' . esc_html($wheel_history['points_deducted']) . '</td>';
+            echo '<td>' . esc_html($wheel_history['adjusted_points']) . '</td>';
             echo '<td>' . ($wheel_history['can_spin'] ? __('Yes', 'wheel-manager-bme') : __('No', 'wheel-manager-bme')) . '</td>';
             echo '</tr>';
         }

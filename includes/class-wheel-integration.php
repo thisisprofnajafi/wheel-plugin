@@ -62,7 +62,8 @@ class Wheel_Manager_BME_Wheel_Integration {
                 'last_spin_time' => null,
                 'can_spin' => false,
                 'available_points' => 0,
-                'points_needed' => 10
+                'points_needed' => 10,
+                'adjusted_points' => 0
             );
         }
         
@@ -93,6 +94,10 @@ class Wheel_Manager_BME_Wheel_Integration {
         // Get current MyCred points
         $available_points = $this->mycred_integration->get_user_available_points($user_id);
         
+        // Calculate adjusted points (remove 10 points per spin divided by 2)
+        $points_deducted = ($total_spins * 10) / 2;
+        $adjusted_points = $available_points - $points_deducted;
+        
         // Calculate if user can spin
         $can_spin = true;
         
@@ -103,7 +108,7 @@ class Wheel_Manager_BME_Wheel_Integration {
         
         // Check if user has enough points (10 points per spin)
         $points_needed = 10;
-        if ($available_points < $points_needed) {
+        if ($adjusted_points < $points_needed) {
             $can_spin = false;
         }
         
@@ -114,6 +119,8 @@ class Wheel_Manager_BME_Wheel_Integration {
             'last_spin_time' => $last_spin_time,
             'can_spin' => $can_spin,
             'available_points' => $available_points,
+            'adjusted_points' => $adjusted_points,
+            'points_deducted' => $points_deducted,
             'points_needed' => $points_needed,
             'spins' => $spins
         );
