@@ -69,19 +69,32 @@ class Wheel_Manager_BME_Wheel_Integration {
                 
                 // Force wheel display
                 if (typeof WOF !== 'undefined') {
+                    // Show wheel immediately
                     WOF.Dispatcher.subscribe('wof-before-display', function(wheel) {
                         error_log('Wheel Manager BME - Wheel before display event');
+                        wheel.appeartype = 'immediately';
+                        wheel.appeardelay = 0;
                         return true;
                     });
 
                     WOF.Dispatcher.subscribe('wof-after-display', function(wheel) {
                         error_log('Wheel Manager BME - Wheel after display event');
                     });
+
+                    // Show wheel overlay
+                    $('.wof-overlay').show();
+                    
+                    // Show wheel container
+                    $('.wof-wheels').show();
                 }
 
                 // Add custom CSS for wheel visibility
                 $('<style>')
-                    .text('.wof-wheel { display: block !important; }')
+                    .text(`
+                        .wof-wheel { display: block !important; }
+                        .wof-overlay { display: block !important; }
+                        .wof-wheels { display: block !important; }
+                    `)
                     .appendTo('head');
             });
             </script>
@@ -117,6 +130,7 @@ class Wheel_Manager_BME_Wheel_Integration {
             $wheel->active = 1;
             $wheel->appeartype = 'immediately';
             $wheel->appeardelay = 0;
+            $wheel->usage = 'popup';
         }
         
         return $wheels;
