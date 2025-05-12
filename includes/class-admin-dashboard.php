@@ -626,8 +626,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
                 ) as total_points_won,
                 MAX(o.created_date) as last_spin_time
             FROM {$wpdb->prefix}wof_optins o
-            WHERE o.segment_text IS NOT NULL 
-            AND o.segment_text != ''
+            
             GROUP BY o.email
             ORDER BY last_spin_time DESC"
         );
