@@ -39,6 +39,28 @@ class Wheel_Manager_BME_Wheel_Integration {
         
         // Add custom hooks for prize calculation
         add_filter('mabel_wof_lite_calculate_prize', array($this, 'calculate_final_prize'), 10, 3);
+
+        // Add filter for wheel visibility
+        add_filter('wof_active_wheels', array($this, 'filter_active_wheels'), 10, 1);
+    }
+
+    /**
+     * Filter active wheels based on user points
+     */
+    public function filter_active_wheels($wheels) {
+        if (!is_user_logged_in()) {
+            return array();
+        }
+
+        $user_id = get_current_user_id();
+        $available_points = $this->mycred_integration->get_user_available_points($user_id);
+        echo $available_points;
+
+        if ($available_points < $this->min_points_for_spin) {
+            return array();
+        }
+
+        return $wheels;
     }
 
     /**
