@@ -52,16 +52,21 @@ class Wheel_Manager_BME_Wheel_Integration {
      */
     public function initialize_wheel() {
         if (!is_user_logged_in()) {
+            error_log('Wheel Manager BME - User not logged in, skipping wheel initialization');
             return;
         }
 
         $user_id = get_current_user_id();
-        $available_points = $this->mycred_integration->get_user_available_points($user_id);
+        $available_points = (int)$this->mycred_integration->get_user_available_points($user_id);
+        $min_points = (int)$this->min_points_for_spin;
         
         error_log('Wheel Manager BME - Initializing wheel display for prof');
-        error_log('Wheel Manager BME - User ID: ' . $user_id . ', Available Points: ' . $available_points);
+        error_log('Wheel Manager BME - User ID: ' . $user_id);
+        error_log('Wheel Manager BME - Available Points: ' . $available_points . ' (type: ' . gettype($available_points) . ')');
+        error_log('Wheel Manager BME - Minimum Points Required: ' . $min_points . ' (type: ' . gettype($min_points) . ')');
 
-        if ($available_points >= $this->min_points_for_spin) {
+        if ($available_points >= $min_points) {
+            error_log('Wheel Manager BME - User has sufficient points, proceeding with wheel display');
             ?>
             <script type="text/javascript">
             jQuery(document).ready(function($) {
@@ -85,7 +90,7 @@ class Wheel_Manager_BME_Wheel_Integration {
                     function applyWheelStyles() {
                         console.log('Wheel Manager BME - Applying wheel styles');
                         
-                        // Get wheel elements with specific data-id
+                        // Get wheel elements
                         var $wheel = $('.wof-wheel');
                         var $overlay = $('.wof-overlay');
                         var $wheels = $('.wof-wheels');
@@ -176,10 +181,16 @@ class Wheel_Manager_BME_Wheel_Integration {
                     $(document).on('click', function() {
                         applyWheelStyles();
                     });
+                } else {
+                    error_log('Wheel Manager BME - WOF object not found in window');
                 }
             });
             </script>
             <?php
+        } else {
+            error_log('Wheel Manager BME - User has insufficient points');
+            error_log('Wheel Manager BME - Points comparison: ' . $available_points . ' < ' . $min_points);
+            error_log('Wheel Manager BME - Points difference: ' . ($min_points - $available_points) . ' points needed');
         }
     }
 
