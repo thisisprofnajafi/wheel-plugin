@@ -1,61 +1,105 @@
-(function($) {
-    'use strict';
-
-    // Initialize when document is ready
-    $(document).ready(function() {
-        // Add any admin-specific functionality here
-        initializeAdminSettings();
+jQuery(document).ready(function($) {
+    // Initialize tooltips
+    $('.wheel-manager-tooltip').tooltipster({
+        theme: 'tooltipster-light',
+        maxWidth: 300
     });
 
-    function initializeAdminSettings() {
-        // Example: Toggle settings sections
-        $('.wheel-manager-settings .section-toggle').on('click', function(e) {
-            e.preventDefault();
-            $(this).next('.section-content').slideToggle();
-        });
+    // Handle table sorting
+    $('.wp-list-table').tablesorter({
+        sortList: [[0,0]],
+        headers: {
+            0: { sorter: 'text' },
+            1: { sorter: 'digit' },
+            2: { sorter: 'digit' },
+            3: { sorter: 'digit' },
+            4: { sorter: 'digit' }
+        }
+    });
 
-        // Example: Save settings via AJAX
-        $('#wheel-manager-settings-form').on('submit', function(e) {
-            e.preventDefault();
-            
-            var $form = $(this);
-            var $submitButton = $form.find('input[type="submit"]');
-            
-            $submitButton.prop('disabled', true);
-            
-            $.ajax({
-                url: ajaxurl,
-                type: 'POST',
-                data: $form.serialize(),
-                success: function(response) {
-                    if (response.success) {
-                        // Show success message
-                        showNotice('success', 'Settings saved successfully.');
-                    } else {
-                        // Show error message
-                        showNotice('error', 'Failed to save settings.');
-                    }
-                },
-                error: function() {
-                    showNotice('error', 'An error occurred while saving settings.');
-                },
-                complete: function() {
-                    $submitButton.prop('disabled', false);
-                }
-            });
-        });
-    }
-
-    function showNotice(type, message) {
-        var $notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + message + '</p></div>');
-        $('.wheel-manager-settings').prepend($notice);
+    // Add refresh button functionality
+    $('.wheel-manager-refresh').on('click', function(e) {
+        e.preventDefault();
+        var $button = $(this);
+        var $container = $button.closest('.wheel-manager-stats');
         
-        // Auto dismiss after 3 seconds
-        setTimeout(function() {
-            $notice.fadeOut(function() {
-                $(this).remove();
-            });
-        }, 3000);
-    }
+        $button.addClass('updating-message');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'wheel_manager_refresh_stats',
+                nonce: wheel_manager_bme.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    $container.find('.stat-box').each(function() {
+                        var $box = $(this);
+                        var stat = $box.data('stat');
+                        if (response.data[stat]) {
+                            $box.find('p').text(response.data[stat]);
+                        }
+                    });
+                }
+            },
+            complete: function() {
+                $button.removeClass('updating-message');
+            }
+        });
+    });
 
-})(jQuery); 
+    // Add export functionality
+    $('.wheel-manager-export').on('click', function(e) {
+        e.preventDefault();
+        var $button = $(this);
+        var type = $button.data('type');
+        
+        $button.addClass('updating-message');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'wheel_manager_export',
+                type: type,
+                nonce: wheel_manager_bme.nonce
+            },
+            success: function(response) {
+                if (response.success && response.data.url) {
+                    window.location.href = response.data.url;
+                }
+            },
+            complete: function() {
+                $button.removeClass('updating-message');
+            }
+        });
+    });
+
+    // Add date range filter functionality
+    $('.wheel-manager-date-range').on('change', function() {
+        var $select = $(this);
+        var $container = $select.closest('.wheel-manager-recent');
+        var range = $select.val();
+        
+        $container.addClass('loading');
+        
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'wheel_manager_filter_spins',
+                range: range,
+                nonce: wheel_manager_bme.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    $container.find('tbody').html(response.data.html);
+                }
+            },
+            complete: function() {
+                $container.removeClass('loading');
+            }
+        });
+    });
+}); 

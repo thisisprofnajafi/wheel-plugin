@@ -1,0 +1,76 @@
+.wheel-manager-stats {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.wheel-manager-stats .stat-box {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    flex: 1;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.wheel-manager-stats .stat-box h3 {
+    margin: 0 0 10px;
+    color: #23282d;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.wheel-manager-stats .stat-box p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #0073aa;
+}
+
+.wheel-manager-recent {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.wheel-manager-recent h2 {
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.wp-list-table {
+    margin-top: 10px;
+}
+
+.wp-list-table th {
+    font-weight: 600;
+}
+
+.wp-list-table td {
+    vertical-align: middle;
+}
+
+.wp-list-table .column-multiplier {
+    text-align: center;
+}
+
+.wp-list-table .column-points {
+    text-align: right;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 782px) {
+    .wheel-manager-stats {
+        flex-direction: column;
+    }
+    
+    .wheel-manager-stats .stat-box {
+        margin-bottom: 10px;
+    }
+} 
