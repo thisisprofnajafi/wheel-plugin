@@ -48,18 +48,24 @@ class Wheel_Manager_BME_Wheel_Integration {
      * Filter active wheels based on user points
      */
     public function filter_active_wheels($wheels) {
+        error_log('Wheel Manager BME - Filtering active wheels');
+        error_log('Wheel Manager BME - Number of wheels before filter: ' . count($wheels));
+
         if (!is_user_logged_in()) {
+            error_log('Wheel Manager BME - User not logged in, hiding all wheels');
             return array();
         }
 
         $user_id = get_current_user_id();
         $available_points = $this->mycred_integration->get_user_available_points($user_id);
-        echo "total creds count: " . $available_points;
+        error_log('Wheel Manager BME - User ID: ' . $user_id . ', Available Points: ' . $available_points);
 
         if ($available_points < $this->min_points_for_spin) {
+            error_log('Wheel Manager BME - User has insufficient points, hiding all wheels');
             return array();
         }
 
+        error_log('Wheel Manager BME - User has sufficient points, showing wheels');
         return $wheels;
     }
 
@@ -67,33 +73,46 @@ class Wheel_Manager_BME_Wheel_Integration {
      * Check if user can spin the wheel
      */
     public function check_spin_eligibility($can_spin, $wheel_id) {
+        error_log('Wheel Manager BME - Checking spin eligibility for wheel ID: ' . $wheel_id);
+        
         if (!is_user_logged_in()) {
+            error_log('Wheel Manager BME - User not logged in, cannot spin');
             return false;
         }
 
         $user_id = get_current_user_id();
         $available_points = $this->mycred_integration->get_user_available_points($user_id);
+        error_log('Wheel Manager BME - User ID: ' . $user_id . ', Available Points: ' . $available_points);
         
-        return $available_points >= $this->min_points_for_spin;
+        $can_spin = $available_points >= $this->min_points_for_spin;
+        error_log('Wheel Manager BME - Can user spin? ' . ($can_spin ? 'Yes' : 'No'));
+        
+        return $can_spin;
     }
 
     /**
      * Actions before wheel spin
      */
     public function before_spin($wheel_id, $user_id) {
+        error_log('Wheel Manager BME - Before spin for wheel ID: ' . $wheel_id . ', User ID: ' . $user_id);
+        
         if (!is_user_logged_in()) {
+            error_log('Wheel Manager BME - User not logged in, cannot spin');
             return false;
         }
 
         $available_points = $this->mycred_integration->get_user_available_points($user_id);
         $points_cost = $this->calculate_points_cost($available_points);
+        error_log('Wheel Manager BME - Available Points: ' . $available_points . ', Points Cost: ' . $points_cost);
 
         if ($available_points < $points_cost) {
+            error_log('Wheel Manager BME - Insufficient points for spin');
             return false;
         }
 
         // Deduct points
         $this->mycred_integration->deduct_points($user_id, $points_cost, 'wheel_spin');
+        error_log('Wheel Manager BME - Points deducted successfully');
         return true;
     }
 
@@ -101,12 +120,16 @@ class Wheel_Manager_BME_Wheel_Integration {
      * Actions after wheel spin
      */
     public function after_spin($wheel_id, $user_id, $prize) {
+        error_log('Wheel Manager BME - After spin for wheel ID: ' . $wheel_id . ', User ID: ' . $user_id . ', Prize: ' . $prize);
+        
         if (!is_user_logged_in()) {
+            error_log('Wheel Manager BME - User not logged in, cannot process spin');
             return;
         }
 
         $multiplier = $this->apply_points_multiplier(1, $user_id);
         $final_prize = $prize * $multiplier;
+        error_log('Wheel Manager BME - Multiplier: ' . $multiplier . ', Final Prize: ' . $final_prize);
 
         // Log the spin
         global $wpdb;
@@ -123,9 +146,11 @@ class Wheel_Manager_BME_Wheel_Integration {
             ),
             array('%d', '%d', '%f', '%f', '%f', '%f', '%s')
         );
+        error_log('Wheel Manager BME - Spin logged in database');
 
         // Add points to MyCred
         $this->mycred_integration->add_points_to_mycred($user_id, $final_prize);
+        error_log('Wheel Manager BME - Points added to MyCred');
 
         return array(
             'final_prize' => $final_prize,
