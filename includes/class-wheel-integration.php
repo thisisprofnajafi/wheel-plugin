@@ -70,16 +70,16 @@ class Wheel_Manager_BME_Wheel_Integration {
         
         // Get all spins for this user
         $spins = $wpdb->get_results($wpdb->prepare(
-            "SELECT segment_text, created_at 
+            "SELECT segment_text, created_date 
             FROM {$wpdb->prefix}wof_optins 
             WHERE email = %s 
-            ORDER BY created_at DESC",
+            ORDER BY created_date DESC",
             $user_email
         ));
         
         $total_points_won = 0;
         $total_spins = count($spins);
-        $last_spin_time = $total_spins > 0 ? $spins[0]->created_at : null;
+        $last_spin_time = $total_spins > 0 ? $spins[0]->created_date : null;
         
         // Calculate total points won
         foreach ($spins as $spin) {
@@ -133,10 +133,10 @@ class Wheel_Manager_BME_Wheel_Integration {
         
         // Get last spin time from wof_optins table
         $last_spin = $wpdb->get_var($wpdb->prepare(
-            "SELECT created_at 
+            "SELECT created_date 
             FROM {$wpdb->prefix}wof_optins 
             WHERE email = %s 
-            ORDER BY created_at DESC 
+            ORDER BY created_date DESC 
             LIMIT 1",
             $user->user_email
         ));
