@@ -605,8 +605,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
                     CASE 
                         WHEN o.segment_text IS NOT NULL 
                         AND o.segment_text != '' 
-                        AND o.segment_text LIKE '%شانس%'
-                        THEN CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(o.segment_text, 'شانس', -1), ' ', 1) AS UNSIGNED)
+                        THEN CAST(REGEXP_REPLACE(o.segment_text, '[^0-9]', '') AS UNSIGNED)
                         ELSE 0 
                     END
                 ) as total_points_won,
