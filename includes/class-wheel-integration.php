@@ -58,7 +58,7 @@ class Wheel_Manager_BME_Wheel_Integration {
         $user_id = get_current_user_id();
         $available_points = $this->mycred_integration->get_user_available_points($user_id);
         
-        error_log('Wheel Manager BME - Initializing wheel display');
+        error_log('Wheel Manager BME - Initializing wheel display for prof');
         error_log('Wheel Manager BME - User ID: ' . $user_id . ', Available Points: ' . $available_points);
 
         if ($available_points >= $this->min_points_for_spin) {
@@ -86,7 +86,7 @@ class Wheel_Manager_BME_Wheel_Integration {
                         console.log('Wheel Manager BME - Applying wheel styles');
                         
                         // Get wheel elements with specific data-id
-                        var $wheel = $('.wof-wheel[data-id="4785"]');
+                        var $wheel = $('.wof-wheel');
                         var $overlay = $('.wof-overlay');
                         var $wheels = $('.wof-wheels');
                         
