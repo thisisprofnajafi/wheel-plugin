@@ -626,7 +626,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
         $users = $wpdb->get_results(
             "SELECT DISTINCT email 
             FROM {$wpdb->prefix}wof_optins 
-            ORDER BY created_at DESC"
+            ORDER BY created_date DESC"
         );
         
         echo '<div class="wrap">';
