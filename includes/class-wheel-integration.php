@@ -48,6 +48,103 @@ class Wheel_Manager_BME_Wheel_Integration {
     }
 
     /**
+     * Get user's wheel history and points calculation
+     */
+    private function get_user_wheel_history($user_email) {
+        global $wpdb;
+        
+        // Get user ID from email
+        $user = get_user_by('email', $user_email);
+        if (!$user) {
+            return array(
+                'total_points_won' => 0,
+                'total_spins' => 0,
+                'last_spin_time' => null,
+                'can_spin' => false,
+                'available_points' => 0,
+                'points_needed' => 10
+            );
+        }
+        
+        $user_id = $user->ID;
+        
+        // Get all spins for this user
+        $spins = $wpdb->get_results($wpdb->prepare(
+            "SELECT segment_text, created_at 
+            FROM {$wpdb->prefix}wof_optins 
+            WHERE email = %s 
+            ORDER BY created_at DESC",
+            $user_email
+        ));
+        
+        $total_points_won = 0;
+        $total_spins = count($spins);
+        $last_spin_time = $total_spins > 0 ? $spins[0]->created_at : null;
+        
+        // Calculate total points won
+        foreach ($spins as $spin) {
+            // Extract number from segment_text
+            preg_match('/\d+/', $spin->segment_text, $matches);
+            if (!empty($matches)) {
+                $total_points_won += (int)$matches[0];
+            }
+        }
+        
+        // Get current MyCred points
+        $available_points = $this->mycred_integration->get_user_available_points($user_id);
+        
+        // Calculate if user can spin
+        $can_spin = true;
+        
+        // Check 24-hour restriction
+        if ($last_spin_time && (time() - strtotime($last_spin_time)) < 86400) {
+            $can_spin = false;
+        }
+        
+        // Check if user has enough points (10 points per spin)
+        $points_needed = 10;
+        if ($available_points < $points_needed) {
+            $can_spin = false;
+        }
+        
+        return array(
+            'user_id' => $user_id,
+            'total_points_won' => $total_points_won,
+            'total_spins' => $total_spins,
+            'last_spin_time' => $last_spin_time,
+            'can_spin' => $can_spin,
+            'available_points' => $available_points,
+            'points_needed' => $points_needed,
+            'spins' => $spins
+        );
+    }
+
+    /**
+     * Get the last time the user spun the wheel
+     */
+    private function get_last_spin_time($user_id) {
+        global $wpdb;
+        
+        // Get user email
+        $user = get_user_by('id', $user_id);
+        if (!$user) {
+            return null;
+        }
+        
+        // Get last spin time from wof_optins table
+        $last_spin = $wpdb->get_var($wpdb->prepare(
+            "SELECT created_at 
+            FROM {$wpdb->prefix}wof_optins 
+            WHERE email = %s 
+            ORDER BY created_at DESC 
+            LIMIT 1",
+            $user->user_email
+        ));
+        
+        return $last_spin;
+    }
+
+    /**
      * Initialize wheel display
      */
     public function initialize_wheel() {
@@ -63,15 +160,25 @@ class Wheel_Manager_BME_Wheel_Integration {
         }
 
         $user_id = get_current_user_id();
+        $user = get_user_by('id', $user_id);
         
-        // Check if user has used the wheel in the last 24 hours
-        $last_spin = $this->get_last_spin_time($user_id);
-        if ($last_spin && (time() - strtotime($last_spin)) < 86400) { // 86400 seconds = 24 hours
-            error_log('Wheel Manager BME - User has used the wheel in the last 24 hours');
+        // Get user's wheel history
+        $wheel_history = $this->get_user_wheel_history($user->user_email);
+        
+        error_log('Wheel Manager BME - User wheel history: ' . print_r($wheel_history, true));
+        
+        if (!$wheel_history['can_spin']) {
+            error_log('Wheel Manager BME - User cannot spin wheel');
+            error_log('Wheel Manager BME - Last spin: ' . $wheel_history['last_spin_time']);
+            error_log('Wheel Manager BME - Available points: ' . $wheel_history['available_points']);
             return;
         }
 
-        $available_points = (int)$this->mycred_integration->get_user_available_points($user_id);
+        error_log('Wheel Manager BME - User can spin wheel');
+        error_log('Wheel Manager BME - Total points won: ' . $wheel_history['total_points_won']);
+        error_log('Wheel Manager BME - Total spins: ' . $wheel_history['total_spins']);
+        
+        $available_points = $wheel_history['available_points'];
         $min_points = (int)$this->min_points_for_spin;
         
         error_log('Wheel Manager BME - Initializing wheel display for prof');
@@ -202,24 +309,6 @@ class Wheel_Manager_BME_Wheel_Integration {
             error_log('Wheel Manager BME - Points comparison: ' . $available_points . ' < ' . $min_points);
             error_log('Wheel Manager BME - Points difference: ' . ($min_points - $available_points) . ' points needed');
         }
-    }
-
-    /**
-     * Get the last time the user spun the wheel
-     */
-    private function get_last_spin_time($user_id) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'wheel_spin_history';
-        
-        $last_spin = $wpdb->get_var($wpdb->prepare(
-            "SELECT created_at FROM $table_name 
-            WHERE user_id = %d 
-            ORDER BY created_at DESC 
-            LIMIT 1",
-            $user_id
-        ));
-        
-        return $last_spin;
     }
 
     /**

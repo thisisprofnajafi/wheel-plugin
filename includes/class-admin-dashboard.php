@@ -615,6 +615,53 @@ class Wheel_Manager_BME_Admin_Dashboard {
         </div>
         <?php
     }
+
+    /**
+     * Display wheel history table
+     */
+    public function display_wheel_history() {
+        global $wpdb;
+        
+        // Get all users who have spun the wheel
+        $users = $wpdb->get_results(
+            "SELECT DISTINCT email 
+            FROM {$wpdb->prefix}wof_optins 
+            ORDER BY created_at DESC"
+        );
+        
+        echo '<div class="wrap">';
+        echo '<h2>' . __('Wheel Spin History', 'wheel-manager-bme') . '</h2>';
+        
+        echo '<table class="wp-list-table widefat fixed striped">';
+        echo '<thead>';
+        echo '<tr>';
+        echo '<th>' . __('User', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('Total Spins', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('Total Points Won', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('Last Spin', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('Available Points', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('Can Spin', 'wheel-manager-bme') . '</th>';
+        echo '</tr>';
+        echo '</thead>';
+        echo '<tbody>';
+        
+        foreach ($users as $user_data) {
+            $wheel_history = $this->wheel_integration->get_user_wheel_history($user_data->email);
+            
+            echo '<tr>';
+            echo '<td>' . esc_html($user_data->email) . '</td>';
+            echo '<td>' . esc_html($wheel_history['total_spins']) . '</td>';
+            echo '<td>' . esc_html($wheel_history['total_points_won']) . '</td>';
+            echo '<td>' . esc_html($wheel_history['last_spin_time']) . '</td>';
+            echo '<td>' . esc_html($wheel_history['available_points']) . '</td>';
+            echo '<td>' . ($wheel_history['can_spin'] ? __('Yes', 'wheel-manager-bme') : __('No', 'wheel-manager-bme')) . '</td>';
+            echo '</tr>';
+        }
+        
+        echo '</tbody>';
+        echo '</table>';
+        echo '</div>';
+    }
 }
 
 // Initialize the admin dashboard
