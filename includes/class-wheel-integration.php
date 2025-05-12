@@ -54,7 +54,7 @@ class Wheel_Manager_BME_Wheel_Integration {
 
         $user_id = get_current_user_id();
         $available_points = $this->mycred_integration->get_user_available_points($user_id);
-        echo $available_points;
+        echo "total creds count: " . $available_points;
 
         if ($available_points < $this->min_points_for_spin) {
             return array();
