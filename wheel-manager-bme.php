@@ -94,21 +94,53 @@ class Wheel_Manager_BME {
      * Check if required plugins are active
      */
     private function check_dependencies() {
-        return (
-            class_exists('myCRED_Core') &&
-            class_exists('OptinWheel')
-        );
+        // Check if MyCred is active
+        $mycred_active = false;
+        if (class_exists('myCRED_Core') || function_exists('mycred_get_settings')) {
+            $mycred_active = true;
+        }
+
+        // Check if Optin Wheel is active
+        $optin_wheel_active = false;
+        if (class_exists('MABEL_WOF_LITE\Wheel_Of_Fortune') || 
+            class_exists('OptinWheel') || 
+            function_exists('wof_get_settings')) {
+            $optin_wheel_active = true;
+        }
+
+        return ($mycred_active && $optin_wheel_active);
     }
 
     /**
      * Display dependency notice
      */
     public function dependency_notice() {
-        ?>
-        <div class="notice notice-error">
-            <p><?php _e('Wheel Manager BME requires MyCred and Optin Wheel to be installed and activated.', 'wheel-manager-bme'); ?></p>
-        </div>
-        <?php
+        $missing_plugins = array();
+
+        // Check MyCred
+        if (!class_exists('myCRED_Core') && !function_exists('mycred_get_settings')) {
+            $missing_plugins[] = 'MyCred';
+        }
+
+        // Check Optin Wheel
+        if (!class_exists('MABEL_WOF_LITE\Wheel_Of_Fortune') && 
+            !class_exists('OptinWheel') && 
+            !function_exists('wof_get_settings')) {
+            $missing_plugins[] = 'Optin Wheel';
+        }
+
+        if (!empty($missing_plugins)) {
+            ?>
+            <div class="notice notice-error">
+                <p><?php 
+                    printf(
+                        __('Wheel Manager BME requires the following plugins to be installed and activated: %s', 'wheel-manager-bme'),
+                        '<strong>' . implode(', ', $missing_plugins) . '</strong>'
+                    ); 
+                ?></p>
+            </div>
+            <?php
+        }
     }
 
     /**
