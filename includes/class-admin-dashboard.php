@@ -27,12 +27,25 @@ class Wheel_Manager_BME_Admin_Dashboard {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
         add_action('wp_ajax_wheel_manager_get_filtered_points', array($this, 'get_filtered_points'));
+        
+        // Add settings link to plugins page
+        add_filter('plugin_action_links_' . plugin_basename(WHEEL_MANAGER_BME_PLUGIN_DIR . 'wheel-manager-bme.php'), array($this, 'add_settings_link'));
+    }
+
+    /**
+     * Add settings link to plugins page
+     */
+    public function add_settings_link($links) {
+        $settings_link = '<a href="admin.php?page=wheel-manager-settings">' . __('Settings', 'wheel-manager-bme') . '</a>';
+        array_unshift($links, $settings_link);
+        return $links;
     }
 
     /**
      * Add admin menu items
      */
     public function add_admin_menu() {
+        // Add main menu
         add_menu_page(
             'Wheel Manager',
             'Wheel Manager',
@@ -43,6 +56,17 @@ class Wheel_Manager_BME_Admin_Dashboard {
             30
         );
 
+        // Add dashboard submenu
+        add_submenu_page(
+            'wheel-manager',
+            'Dashboard',
+            'Dashboard',
+            'manage_options',
+            'wheel-manager',
+            array($this, 'display_dashboard')
+        );
+
+        // Add points submenu
         add_submenu_page(
             'wheel-manager',
             'User Points',
@@ -52,6 +76,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
             array($this, 'display_points_table')
         );
 
+        // Add spin history submenu
         add_submenu_page(
             'wheel-manager',
             'Spin History',
@@ -59,6 +84,16 @@ class Wheel_Manager_BME_Admin_Dashboard {
             'manage_options',
             'wheel-manager-history',
             array($this, 'display_spin_history')
+        );
+
+        // Add settings submenu
+        add_submenu_page(
+            'wheel-manager',
+            'Settings',
+            'Settings',
+            'manage_options',
+            'wheel-manager-settings',
+            array($this, 'display_settings_page')
         );
     }
 
@@ -461,6 +496,123 @@ class Wheel_Manager_BME_Admin_Dashboard {
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?php
+    }
+
+    /**
+     * Display settings page
+     */
+    public function display_settings_page() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        // Save settings if form is submitted
+        if (isset($_POST['wheel_manager_bme_settings_nonce']) && 
+            wp_verify_nonce($_POST['wheel_manager_bme_settings_nonce'], 'wheel_manager_bme_save_settings')) {
+            
+            $settings = array(
+                'min_points_for_spin' => isset($_POST['min_points_for_spin']) ? floatval($_POST['min_points_for_spin']) : 10,
+                'points_for_six_spins' => isset($_POST['points_for_six_spins']) ? floatval($_POST['points_for_six_spins']) : 50,
+                'points_for_fifteen_spins' => isset($_POST['points_for_fifteen_spins']) ? floatval($_POST['points_for_fifteen_spins']) : 100,
+                'enable_multiplier' => isset($_POST['enable_multiplier']) ? true : false,
+                'multiplier_threshold' => isset($_POST['multiplier_threshold']) ? floatval($_POST['multiplier_threshold']) : 100,
+                'multiplier_value' => isset($_POST['multiplier_value']) ? floatval($_POST['multiplier_value']) : 1.5
+            );
+
+            update_option('wheel_manager_bme_settings', $settings);
+            echo '<div class="notice notice-success"><p>' . __('Settings saved successfully.', 'wheel-manager-bme') . '</p></div>';
+        }
+
+        // Get current settings
+        $settings = get_option('wheel_manager_bme_settings', array(
+            'min_points_for_spin' => 10,
+            'points_for_six_spins' => 50,
+            'points_for_fifteen_spins' => 100,
+            'enable_multiplier' => true,
+            'multiplier_threshold' => 100,
+            'multiplier_value' => 1.5
+        ));
+        ?>
+        <div class="wrap">
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+
+            <form method="post" action="">
+                <?php wp_nonce_field('wheel_manager_bme_save_settings', 'wheel_manager_bme_settings_nonce'); ?>
+
+                <table class="form-table">
+                    <tr>
+                        <th scope="row">
+                            <label for="min_points_for_spin"><?php _e('Minimum Points for Spin', 'wheel-manager-bme'); ?></label>
+                        </th>
+                        <td>
+                            <input type="number" name="min_points_for_spin" id="min_points_for_spin" 
+                                value="<?php echo esc_attr($settings['min_points_for_spin']); ?>" class="regular-text" step="0.01" min="0">
+                            <p class="description"><?php _e('Minimum points required for a single spin.', 'wheel-manager-bme'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="points_for_six_spins"><?php _e('Points for Six Spins', 'wheel-manager-bme'); ?></label>
+                        </th>
+                        <td>
+                            <input type="number" name="points_for_six_spins" id="points_for_six_spins" 
+                                value="<?php echo esc_attr($settings['points_for_six_spins']); ?>" class="regular-text" step="0.01" min="0">
+                            <p class="description"><?php _e('Points required for six spins (cost per spin will be calculated).', 'wheel-manager-bme'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="points_for_fifteen_spins"><?php _e('Points for Fifteen Spins', 'wheel-manager-bme'); ?></label>
+                        </th>
+                        <td>
+                            <input type="number" name="points_for_fifteen_spins" id="points_for_fifteen_spins" 
+                                value="<?php echo esc_attr($settings['points_for_fifteen_spins']); ?>" class="regular-text" step="0.01" min="0">
+                            <p class="description"><?php _e('Points required for fifteen spins (cost per spin will be calculated).', 'wheel-manager-bme'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="enable_multiplier"><?php _e('Enable Points Multiplier', 'wheel-manager-bme'); ?></label>
+                        </th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="enable_multiplier" id="enable_multiplier" 
+                                    <?php checked($settings['enable_multiplier']); ?>>
+                                <?php _e('Enable points multiplier for users with high point balances', 'wheel-manager-bme'); ?>
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="multiplier_threshold"><?php _e('Multiplier Threshold', 'wheel-manager-bme'); ?></label>
+                        </th>
+                        <td>
+                            <input type="number" name="multiplier_threshold" id="multiplier_threshold" 
+                                value="<?php echo esc_attr($settings['multiplier_threshold']); ?>" class="regular-text" step="0.01" min="0">
+                            <p class="description"><?php _e('Minimum points required to activate the multiplier.', 'wheel-manager-bme'); ?></p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">
+                            <label for="multiplier_value"><?php _e('Multiplier Value', 'wheel-manager-bme'); ?></label>
+                        </th>
+                        <td>
+                            <input type="number" name="multiplier_value" id="multiplier_value" 
+                                value="<?php echo esc_attr($settings['multiplier_value']); ?>" class="regular-text" step="0.01" min="1">
+                            <p class="description"><?php _e('The multiplier value to apply to prizes (e.g., 1.5 for 50% bonus).', 'wheel-manager-bme'); ?></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <?php submit_button(__('Save Settings', 'wheel-manager-bme')); ?>
+            </form>
+        </div>
         <?php
     }
 }
