@@ -1,6 +1,8 @@
 jQuery(document).ready(function($) {
-    // Initialize tooltips
-    $('[data-tooltip]').tooltip();
+    // Initialize tooltips only if jQuery UI is available
+    if ($.fn.tooltip) {
+        $('[data-tooltip]').tooltip();
+    }
 
     // Handle table sorting
     $('.sortable').on('click', function() {

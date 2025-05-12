@@ -209,11 +209,16 @@ class Wheel_Manager_BME {
             return;
         }
 
+        // Enqueue jQuery UI
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script('jquery-ui-tooltip');
+        wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+
         wp_enqueue_script(
             'wheel-manager-bme-integration',
             plugins_url('assets/js/wheel-integration.js', __FILE__),
-            array('jquery'),
-            $this->version,
+            array('jquery', 'jquery-ui-core', 'jquery-ui-tooltip'),
+            WHEEL_MANAGER_BME_VERSION,
             true
         );
 
