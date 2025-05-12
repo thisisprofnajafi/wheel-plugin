@@ -72,20 +72,22 @@ class Wheel_Manager_BME {
      * Initialize plugin
      */
     public function init() {
-        // Check dependencies
+        // Check for required plugins
         if (!$this->check_dependencies()) {
             add_action('admin_notices', array($this, 'dependency_notice'));
             return;
         }
 
-        // Load text domain
-        load_plugin_textdomain('wheel-manager-bme', false, dirname(plugin_basename(__FILE__)) . '/languages');
-
         // Load dependencies
         $this->load_dependencies();
 
         // Initialize components
-        $this->init_components();
+        $this->init_mycred_integration();
+        $this->init_wheel_integration();
+        $this->init_admin_dashboard();
+
+        // Enqueue frontend scripts
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
     }
 
     /**
@@ -157,23 +159,56 @@ class Wheel_Manager_BME {
         require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-wheel-integration.php';
         require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-admin-dashboard.php';
         require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-ajax-handlers.php';
+        require_once WHEEL_MANAGER_BME_PLUGIN_DIR . 'includes/class-optin-wheel-integration.php';
     }
 
     /**
      * Initialize plugin components
      */
-    private function init_components() {
+    private function init_mycred_integration() {
         // Initialize MyCred integration
         wheel_manager_bme_mycred_integration();
+    }
 
+    private function init_wheel_integration() {
         // Initialize wheel integration
         wheel_manager_bme_wheel_integration();
+        
+        // Initialize Optin Wheel extension
+        if (class_exists('MABEL_WOF_LITE\Wheel_Of_Fortune')) {
+            wheel_manager_bme_optin_wheel_extension();
+        }
+    }
 
+    private function init_admin_dashboard() {
         // Initialize admin dashboard
         if (is_admin()) {
             wheel_manager_bme_admin_dashboard();
             wheel_manager_bme_ajax_handlers();
         }
+    }
+
+    /**
+     * Enqueue frontend scripts
+     */
+    public function enqueue_frontend_scripts() {
+        if (!is_user_logged_in()) {
+            return;
+        }
+
+        wp_enqueue_script(
+            'wheel-manager-bme-integration',
+            plugins_url('assets/js/wheel-integration.js', __FILE__),
+            array('jquery'),
+            $this->version,
+            true
+        );
+
+        wp_localize_script('wheel-manager-bme-integration', 'wheel_manager_bme', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('wheel_manager_bme'),
+            'user_id' => get_current_user_id()
+        ));
     }
 }
 
