@@ -47,8 +47,8 @@ class Wheel_Manager_BME_Admin_Dashboard {
     public function add_admin_menu() {
         // Add main menu
         add_menu_page(
-            'Wheel Manager',
-            'Wheel Manager',
+            'مدیریت چرخ شانس',
+            'مدیریت چرخ شانس',
             'manage_options',
             'wheel-manager',
             array($this, 'display_dashboard'),
@@ -59,8 +59,8 @@ class Wheel_Manager_BME_Admin_Dashboard {
         // Add dashboard submenu
         add_submenu_page(
             'wheel-manager',
-            'Dashboard',
-            'Dashboard',
+            'داشبورد',
+            'داشبورد',
             'manage_options',
             'wheel-manager',
             array($this, 'display_dashboard')
@@ -89,8 +89,8 @@ class Wheel_Manager_BME_Admin_Dashboard {
         // Add settings submenu
         add_submenu_page(
             'wheel-manager',
-            'Settings',
-            'Settings',
+            'تنظیمات',
+            'تنظیمات',
             'manage_options',
             'wheel-manager-settings',
             array($this, 'display_settings_page')
@@ -132,38 +132,28 @@ class Wheel_Manager_BME_Admin_Dashboard {
     public function display_dashboard() {
         ?>
         <div class="wrap">
-            <h1>Wheel Manager Dashboard</h1>
+            <h1>داشبورد مدیریت چرخ شانس</h1>
             
             <div class="wheel-manager-stats">
                 <div class="stat-box" data-stat="total_spins">
-                    <h3>Total Spins</h3>
+                    <h3>تعداد کل چرخش‌ها</h3>
                     <p><?php echo $this->get_total_spins(); ?></p>
                 </div>
                 
                 <div class="stat-box" data-stat="total_points">
-                    <h3>Total Points Awarded</h3>
+                    <h3>مجموع امتیازات اهدا شده</h3>
                     <p><?php echo $this->get_total_points_awarded(); ?></p>
                 </div>
                 
                 <div class="stat-box" data-stat="active_users">
-                    <h3>Active Users</h3>
+                    <h3>کاربران فعال</h3>
                     <p><?php echo $this->get_active_users_count(); ?></p>
                 </div>
             </div>
 
             <div class="wheel-manager-recent">
-                <h2>Recent Spins</h2>
-                <div class="tablenav top">
-                    <div class="alignleft actions">
-                        <select class="wheel-manager-date-range">
-                            <option value="all">All Time</option>
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                        </select>
-                    </div>
-                </div>
-                <?php $this->display_recent_spins(); ?>
+                <h2>تاریخچه چرخش‌ها</h2>
+                <?php $this->display_wheel_history(); ?>
             </div>
         </div>
         <?php
@@ -521,7 +511,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
             );
 
             update_option('wheel_manager_bme_settings', $settings);
-            echo '<div class="notice notice-success"><p>' . __('Settings saved successfully.', 'wheel-manager-bme') . '</p></div>';
+            echo '<div class="notice notice-success"><p>' . __('تنظیمات با موفقیت ذخیره شد.', 'wheel-manager-bme') . '</p></div>';
         }
 
         // Get current settings
@@ -543,74 +533,74 @@ class Wheel_Manager_BME_Admin_Dashboard {
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="min_points_for_spin"><?php _e('Minimum Points for Spin', 'wheel-manager-bme'); ?></label>
+                            <label for="min_points_for_spin"><?php _e('حداقل امتیاز برای چرخش', 'wheel-manager-bme'); ?></label>
                         </th>
                         <td>
                             <input type="number" name="min_points_for_spin" id="min_points_for_spin" 
                                 value="<?php echo esc_attr($settings['min_points_for_spin']); ?>" class="regular-text" step="0.01" min="0">
-                            <p class="description"><?php _e('Minimum points required for a single spin.', 'wheel-manager-bme'); ?></p>
+                            <p class="description"><?php _e('حداقل امتیاز مورد نیاز برای یک چرخش.', 'wheel-manager-bme'); ?></p>
                         </td>
                     </tr>
 
                     <tr>
                         <th scope="row">
-                            <label for="points_for_six_spins"><?php _e('Points for Six Spins', 'wheel-manager-bme'); ?></label>
+                            <label for="points_for_six_spins"><?php _e('امتیاز برای شش چرخش', 'wheel-manager-bme'); ?></label>
                         </th>
                         <td>
                             <input type="number" name="points_for_six_spins" id="points_for_six_spins" 
                                 value="<?php echo esc_attr($settings['points_for_six_spins']); ?>" class="regular-text" step="0.01" min="0">
-                            <p class="description"><?php _e('Points required for six spins (cost per spin will be calculated).', 'wheel-manager-bme'); ?></p>
+                            <p class="description"><?php _e('امتیاز مورد نیاز برای شش چرخش (هزینه هر چرخش محاسبه خواهد شد).', 'wheel-manager-bme'); ?></p>
                         </td>
                     </tr>
 
                     <tr>
                         <th scope="row">
-                            <label for="points_for_fifteen_spins"><?php _e('Points for Fifteen Spins', 'wheel-manager-bme'); ?></label>
+                            <label for="points_for_fifteen_spins"><?php _e('امتیاز برای پانزده چرخش', 'wheel-manager-bme'); ?></label>
                         </th>
                         <td>
                             <input type="number" name="points_for_fifteen_spins" id="points_for_fifteen_spins" 
                                 value="<?php echo esc_attr($settings['points_for_fifteen_spins']); ?>" class="regular-text" step="0.01" min="0">
-                            <p class="description"><?php _e('Points required for fifteen spins (cost per spin will be calculated).', 'wheel-manager-bme'); ?></p>
+                            <p class="description"><?php _e('امتیاز مورد نیاز برای پانزده چرخش (هزینه هر چرخش محاسبه خواهد شد).', 'wheel-manager-bme'); ?></p>
                         </td>
                     </tr>
 
                     <tr>
                         <th scope="row">
-                            <label for="enable_multiplier"><?php _e('Enable Points Multiplier', 'wheel-manager-bme'); ?></label>
+                            <label for="enable_multiplier"><?php _e('فعال‌سازی ضریب امتیاز', 'wheel-manager-bme'); ?></label>
                         </th>
                         <td>
                             <label>
                                 <input type="checkbox" name="enable_multiplier" id="enable_multiplier" 
                                     <?php checked($settings['enable_multiplier']); ?>>
-                                <?php _e('Enable points multiplier for users with high point balances', 'wheel-manager-bme'); ?>
+                                <?php _e('فعال‌سازی ضریب امتیاز برای کاربران با امتیاز بالا', 'wheel-manager-bme'); ?>
                             </label>
                         </td>
                     </tr>
 
                     <tr>
                         <th scope="row">
-                            <label for="multiplier_threshold"><?php _e('Multiplier Threshold', 'wheel-manager-bme'); ?></label>
+                            <label for="multiplier_threshold"><?php _e('آستانه ضریب', 'wheel-manager-bme'); ?></label>
                         </th>
                         <td>
                             <input type="number" name="multiplier_threshold" id="multiplier_threshold" 
                                 value="<?php echo esc_attr($settings['multiplier_threshold']); ?>" class="regular-text" step="0.01" min="0">
-                            <p class="description"><?php _e('Minimum points required to activate the multiplier.', 'wheel-manager-bme'); ?></p>
+                            <p class="description"><?php _e('حداقل امتیاز مورد نیاز برای فعال‌سازی ضریب.', 'wheel-manager-bme'); ?></p>
                         </td>
                     </tr>
 
                     <tr>
                         <th scope="row">
-                            <label for="multiplier_value"><?php _e('Multiplier Value', 'wheel-manager-bme'); ?></label>
+                            <label for="multiplier_value"><?php _e('مقدار ضریب', 'wheel-manager-bme'); ?></label>
                         </th>
                         <td>
                             <input type="number" name="multiplier_value" id="multiplier_value" 
                                 value="<?php echo esc_attr($settings['multiplier_value']); ?>" class="regular-text" step="0.01" min="1">
-                            <p class="description"><?php _e('The multiplier value to apply to prizes (e.g., 1.5 for 50% bonus).', 'wheel-manager-bme'); ?></p>
+                            <p class="description"><?php _e('مقدار ضریب اعمال شده به جوایز (مثلاً ۱.۵ برای ۵۰٪ پاداش).', 'wheel-manager-bme'); ?></p>
                         </td>
                     </tr>
                 </table>
 
-                <?php submit_button(__('Save Settings', 'wheel-manager-bme')); ?>
+                <?php submit_button(__('ذخیره تنظیمات', 'wheel-manager-bme')); ?>
             </form>
         </div>
         <?php
@@ -635,14 +625,12 @@ class Wheel_Manager_BME_Admin_Dashboard {
         echo '<table class="wp-list-table widefat fixed striped">';
         echo '<thead>';
         echo '<tr>';
-        echo '<th>' . __('User', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('Total Spins', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('Total Points Won', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('Last Spin', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('Available Points', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('Points Deducted', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('Adjusted Points', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('Can Spin', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('کاربر', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('امتیازات چرخ شانس', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('امتیازات MyCred', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('امتیازات تعدیل شده', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('تعداد چرخش/۲', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('آخرین چرخش', 'wheel-manager-bme') . '</th>';
         echo '</tr>';
         echo '</thead>';
         echo '<tbody>';
@@ -652,13 +640,11 @@ class Wheel_Manager_BME_Admin_Dashboard {
             
             echo '<tr>';
             echo '<td>' . esc_html($user_data->email) . '</td>';
-            echo '<td>' . esc_html($wheel_history['total_spins']) . '</td>';
             echo '<td>' . esc_html($wheel_history['total_points_won']) . '</td>';
-            echo '<td>' . esc_html($wheel_history['last_spin_time']) . '</td>';
             echo '<td>' . esc_html($wheel_history['available_points']) . '</td>';
-            echo '<td>' . esc_html($wheel_history['points_deducted']) . '</td>';
             echo '<td>' . esc_html($wheel_history['adjusted_points']) . '</td>';
-            echo '<td>' . ($wheel_history['can_spin'] ? __('Yes', 'wheel-manager-bme') : __('No', 'wheel-manager-bme')) . '</td>';
+            echo '<td>' . esc_html(number_format($wheel_history['total_spins'] / 2, 1)) . '</td>';
+            echo '<td>' . esc_html($wheel_history['last_spin_time']) . '</td>';
             echo '</tr>';
         }
         
