@@ -612,7 +612,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
     public function display_wheel_history() {
         global $wpdb;
         
-        // Get all spins with user information, ignoring empty segment_text
+        // Get all spins with user information
         $spins = $wpdb->get_results(
             "SELECT 
                 o.email,
@@ -627,8 +627,8 @@ class Wheel_Manager_BME_Admin_Dashboard {
                 MAX(o.created_date) as last_spin_time
             FROM {$wpdb->prefix}wof_optins o
             WHERE o.segment_text IS NOT NULL 
+            AND o.segment_text != ''
             GROUP BY o.email
-            HAVING total_spins > 0
             ORDER BY last_spin_time DESC"
         );
         
