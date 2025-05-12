@@ -51,6 +51,12 @@ class Wheel_Manager_BME_Wheel_Integration {
      * Initialize wheel display
      */
     public function initialize_wheel() {
+        // Check if already initialized
+        if (defined('WHEEL_MANAGER_BME_INITIALIZED')) {
+            error_log('Wheel Manager BME - Wheel already initialized, skipping');
+            return;
+        }
+
         if (!is_user_logged_in()) {
             error_log('Wheel Manager BME - User not logged in, skipping wheel initialization');
             return;
@@ -70,6 +76,12 @@ class Wheel_Manager_BME_Wheel_Integration {
             ?>
             <script type="text/javascript">
             jQuery(document).ready(function($) {
+                // Check if already initialized in JavaScript
+                if (window.wheelManagerBMEInitialized) {
+                    console.log('Wheel Manager BME - Already initialized in JavaScript, skipping');
+                    return;
+                }
+
                 console.log('Wheel Manager BME - Setting up wheel display');
                 
                 // Force wheel display
@@ -105,34 +117,22 @@ class Wheel_Manager_BME_Wheel_Integration {
                         if ($wheel.length) {
                             $wheel.css({
                                 'display': 'block',
-                                'transform': 'translateX(0%)',
+                                'transform': 'translateX(0%)'
                             });
                         }
 
                         if ($overlay.length) {
                             $overlay.css({
-                                'display': 'block',
-
+                                'display': 'block'
                             });
                         }
 
                         if ($wheels.length) {
                             $wheels.css({
                                 'display': 'block',
-                                'opacity': '1',
+                                'opacity': '1'
                             });
                         }
-
-                        // // Force wheel to be visible
-                        // $wheel.removeAttr('style').css({
-                        //     'display': 'block',
-                        //     'transform': 'translateX(0%)',
-                        //     'opacity': '1',
-                        //     'visibility': 'visible',
-                        //     'background-color': '#4f4f4f',
-                        //     'position': 'relative',
-                        //     'z-index': '999999'
-                        // });
                     }
 
                     // Apply styles immediately
@@ -162,12 +162,17 @@ class Wheel_Manager_BME_Wheel_Integration {
                     $(document).on('click', function() {
                         applyWheelStyles();
                     });
+
+                    // Mark as initialized
+                    window.wheelManagerBMEInitialized = true;
                 } else {
-                    error_log('Wheel Manager BME - WOF object not found in window');
+                    console.log('Wheel Manager BME - WOF object not found in window');
                 }
             });
             </script>
             <?php
+            // Mark as initialized in PHP
+            define('WHEEL_MANAGER_BME_INITIALIZED', true);
         } else {
             error_log('Wheel Manager BME - User has insufficient points');
             error_log('Wheel Manager BME - Points comparison: ' . $available_points . ' < ' . $min_points);
