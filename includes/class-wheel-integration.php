@@ -42,6 +42,51 @@ class Wheel_Manager_BME_Wheel_Integration {
 
         // Add filter for wheel visibility
         add_filter('wof_active_wheels', array($this, 'filter_active_wheels'), 10, 1);
+
+        // Add action for wheel initialization
+        add_action('wp_footer', array($this, 'initialize_wheel'), 100);
+    }
+
+    /**
+     * Initialize wheel display
+     */
+    public function initialize_wheel() {
+        if (!is_user_logged_in()) {
+            return;
+        }
+
+        $user_id = get_current_user_id();
+        $available_points = $this->mycred_integration->get_user_available_points($user_id);
+        
+        error_log('Wheel Manager BME - Initializing wheel display');
+        error_log('Wheel Manager BME - User ID: ' . $user_id . ', Available Points: ' . $available_points);
+
+        if ($available_points >= $this->min_points_for_spin) {
+            ?>
+            <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                error_log('Wheel Manager BME - Setting up wheel display');
+                
+                // Force wheel display
+                if (typeof WOF !== 'undefined') {
+                    WOF.Dispatcher.subscribe('wof-before-display', function(wheel) {
+                        error_log('Wheel Manager BME - Wheel before display event');
+                        return true;
+                    });
+
+                    WOF.Dispatcher.subscribe('wof-after-display', function(wheel) {
+                        error_log('Wheel Manager BME - Wheel after display event');
+                    });
+                }
+
+                // Add custom CSS for wheel visibility
+                $('<style>')
+                    .text('.wof-wheel { display: block !important; }')
+                    .appendTo('head');
+            });
+            </script>
+            <?php
+        }
     }
 
     /**
@@ -66,6 +111,14 @@ class Wheel_Manager_BME_Wheel_Integration {
         }
 
         error_log('Wheel Manager BME - User has sufficient points, showing wheels');
+        
+        // Ensure wheel is active and visible
+        foreach ($wheels as $wheel) {
+            $wheel->active = 1;
+            $wheel->appeartype = 'immediately';
+            $wheel->appeardelay = 0;
+        }
+        
         return $wheels;
     }
 

@@ -53,6 +53,10 @@ class Wheel_Manager_BME {
 
         // Set version
         update_option('wheel_manager_bme_version', WHEEL_MANAGER_BME_VERSION);
+        
+        // Log activation
+        error_log('Wheel Manager BME - Plugin activated');
+        error_log('Wheel Manager BME - Version: ' . WHEEL_MANAGER_BME_VERSION);
     }
 
     /**
@@ -151,19 +155,12 @@ class Wheel_Manager_BME {
             KEY mycred_log_id (mycred_log_id)
         ) $charset_collate;";
 
-        // Wheel points table
-        $sql .= "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}wheel_points (
-            id bigint(20) NOT NULL AUTO_INCREMENT,
-            user_id bigint(20) NOT NULL,
-            points decimal(10,2) NOT NULL,
-            multiplier decimal(10,2) DEFAULT 1.0,
-            created_at datetime DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY  (id),
-            KEY user_id (user_id)
-        ) $charset_collate;";
-
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+
+        // Log table creation
+        error_log('Wheel Manager BME - Creating/updating database tables');
+        error_log('Wheel Manager BME - SQL: ' . $sql);
     }
 
     /**
