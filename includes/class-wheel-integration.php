@@ -106,26 +106,13 @@ class Wheel_Manager_BME_Wheel_Integration {
                             $wheel.css({
                                 'display': 'block',
                                 'transform': 'translateX(0%)',
-                                'opacity': '1',
-                                'visibility': 'visible',
-                                'background-color': '#4f4f4f',
-                                'position': 'relative',
-                                'z-index': '999999'
                             });
                         }
 
                         if ($overlay.length) {
                             $overlay.css({
                                 'display': 'block',
-                                'opacity': '1',
-                                'visibility': 'visible',
-                                'position': 'fixed',
-                                'top': '0',
-                                'left': '0',
-                                'right': '0',
-                                'bottom': '0',
-                                'background': 'rgba(0,0,0,0.5)',
-                                'z-index': '999998'
+
                             });
                         }
 
@@ -133,25 +120,19 @@ class Wheel_Manager_BME_Wheel_Integration {
                             $wheels.css({
                                 'display': 'block',
                                 'opacity': '1',
-                                'visibility': 'visible',
-                                'position': 'fixed',
-                                'top': '50%',
-                                'left': '50%',
-                                'transform': 'translate(-50%, -50%)',
-                                'z-index': '999999'
                             });
                         }
 
-                        // Force wheel to be visible
-                        $wheel.removeAttr('style').css({
-                            'display': 'block',
-                            'transform': 'translateX(0%)',
-                            'opacity': '1',
-                            'visibility': 'visible',
-                            'background-color': '#4f4f4f',
-                            'position': 'relative',
-                            'z-index': '999999'
-                        });
+                        // // Force wheel to be visible
+                        // $wheel.removeAttr('style').css({
+                        //     'display': 'block',
+                        //     'transform': 'translateX(0%)',
+                        //     'opacity': '1',
+                        //     'visibility': 'visible',
+                        //     'background-color': '#4f4f4f',
+                        //     'position': 'relative',
+                        //     'z-index': '999999'
+                        // });
                     }
 
                     // Apply styles immediately
