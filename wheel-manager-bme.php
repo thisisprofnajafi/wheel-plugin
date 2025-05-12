@@ -88,15 +88,13 @@ class Wheel_Manager_BME {
             $mycred_active = true;
         }
 
-        // Check if Optin Wheel is active
-        $optin_wheel_active = false;
-        if (class_exists('MABEL_WOF_LITE\Wheel_Of_Fortune') || 
-            class_exists('OptinWheel') || 
-            function_exists('wof_get_settings')) {
-            $optin_wheel_active = true;
+        // Check if Mabel Wheel of Fortune is active
+        $wof_active = false;
+        if (class_exists('MABEL_WOF_LITE\Wheel_Of_Fortune')) {
+            $wof_active = true;
         }
 
-        return ($mycred_active && $optin_wheel_active);
+        return ($mycred_active && $wof_active);
     }
 
     /**
@@ -110,11 +108,9 @@ class Wheel_Manager_BME {
             $missing_plugins[] = 'MyCred';
         }
 
-        // Check Optin Wheel
-        if (!class_exists('MABEL_WOF_LITE\Wheel_Of_Fortune') && 
-            !class_exists('OptinWheel') && 
-            !function_exists('wof_get_settings')) {
-            $missing_plugins[] = 'Optin Wheel';
+        // Check Mabel Wheel of Fortune
+        if (!class_exists('MABEL_WOF_LITE\Wheel_Of_Fortune')) {
+            $missing_plugins[] = 'Mabel Wheel of Fortune';
         }
 
         if (!empty($missing_plugins)) {
