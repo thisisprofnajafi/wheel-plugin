@@ -48,12 +48,6 @@ class Wheel_Manager_BME {
      * Plugin activation
      */
     public function activate() {
-        // Check if required plugins are active
-        if (!$this->check_dependencies()) {
-            deactivate_plugins(plugin_basename(__FILE__));
-            wp_die('This plugin requires MyCred and Optin Wheel to be installed and activated.');
-        }
-
         // Create database tables
         $this->create_tables();
 
@@ -72,12 +66,6 @@ class Wheel_Manager_BME {
      * Initialize plugin
      */
     public function init() {
-        // Check for required plugins
-        if (!$this->check_dependencies()) {
-            add_action('admin_notices', array($this, 'dependency_notice'));
-            return;
-        }
-
         // Load dependencies
         $this->load_dependencies();
 
