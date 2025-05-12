@@ -91,7 +91,7 @@ class Wheel_Manager_BME_Wheel_Integration {
                 // Add custom CSS for wheel visibility
                 $('<style>')
                     .text(`
-                        .wof-wheel { display: block !important; }
+                        .wof-wheel { display: block !important; transform: translateX(0%) !important; }
                         .wof-overlay { display: block !important; }
                         .wof-wheels { display: block !important; }
                     `)
