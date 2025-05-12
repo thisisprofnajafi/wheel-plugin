@@ -612,15 +612,24 @@ class Wheel_Manager_BME_Admin_Dashboard {
     public function display_wheel_history() {
         global $wpdb;
         
-        // Get all spins with user information
+        // Get all spins with user information, ignoring empty segment_text
         $spins = $wpdb->get_results(
             "SELECT 
                 o.email,
-                COUNT(*) as total_spins,
-                SUM(CAST(REGEXP_REPLACE(o.segment_text, '[^0-9]', '') AS UNSIGNED)) as total_points_won,
-                MAX(o.created_date) as last_spin_time
+                COUNT(CASE WHEN o.segment_text != '' AND o.segment_text IS NOT NULL THEN 1 END) as total_spins,
+                SUM(
+                    CASE 
+                        WHEN o.segment_text REGEXP '^[0-9]+$' 
+                        THEN CAST(o.segment_text AS UNSIGNED)
+                        ELSE 0 
+                    END
+                ) as total_points_won,
+                MAX(CASE WHEN o.segment_text != '' AND o.segment_text IS NOT NULL THEN o.created_date END) as last_spin_time
             FROM {$wpdb->prefix}wof_optins o
+            WHERE o.segment_text != '' 
+            AND o.segment_text IS NOT NULL
             GROUP BY o.email
+            HAVING total_spins > 0
             ORDER BY last_spin_time DESC"
         );
         
@@ -647,16 +656,21 @@ class Wheel_Manager_BME_Admin_Dashboard {
             $mycred_points = mycred_get_users_balance($user->ID);
             
             // Calculate adjusted points (MyCred points minus points deducted for spins)
-            $points_deducted = ($spin->total_spins * 10) / 2;
-            $adjusted_points = $mycred_points - $points_deducted;
+            $points_deducted = ($spin->total_spins * 10);
+            $adjusted_points = max(0, $mycred_points - $points_deducted);
+            
+            // Format the last spin time
+            $last_spin = new DateTime($spin->last_spin_time);
+            $last_spin->setTimezone(new DateTimeZone('Asia/Tehran'));
+            $formatted_last_spin = $last_spin->format('Y-m-d H:i:s');
             
             echo '<tr>';
             echo '<td>' . esc_html($spin->email) . '</td>';
-            echo '<td>' . esc_html($spin->total_points_won) . '</td>';
-            echo '<td>' . esc_html($mycred_points) . '</td>';
-            echo '<td>' . esc_html($adjusted_points) . '</td>';
+            echo '<td>' . esc_html(number_format($spin->total_points_won, 0)) . '</td>';
+            echo '<td>' . esc_html(number_format($mycred_points, 0)) . '</td>';
+            echo '<td>' . esc_html(number_format($adjusted_points, 0)) . '</td>';
             echo '<td>' . esc_html($spin->total_spins) . '</td>';
-            echo '<td>' . esc_html($spin->last_spin_time) . '</td>';
+            echo '<td>' . esc_html($formatted_last_spin) . '</td>';
             echo '</tr>';
         }
         
