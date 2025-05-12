@@ -70,20 +70,20 @@ class Wheel_Manager_BME_Wheel_Integration {
             ?>
             <script type="text/javascript">
             jQuery(document).ready(function($) {
-                error_log('Wheel Manager BME - Setting up wheel display');
+                console.log('Wheel Manager BME - Setting up wheel display');
                 
                 // Force wheel display
                 if (typeof WOF !== 'undefined') {
                     // Show wheel immediately
                     WOF.Dispatcher.subscribe('wof-before-display', function(wheel) {
-                        error_log('Wheel Manager BME - Wheel before display event');
+                        console.log('Wheel Manager BME - Wheel before display event');
                         wheel.appeartype = 'immediately';
-                        wheel.appeardelay = 0;
+                        wheel.appeardelay = 4;
                         return true;
                     });
 
                     WOF.Dispatcher.subscribe('wof-after-display', function(wheel) {
-                        error_log('Wheel Manager BME - Wheel after display event');
+                        console.log('Wheel Manager BME - Wheel after display event');
                     });
 
                     // Directly style the wheel elements
