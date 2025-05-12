@@ -63,6 +63,14 @@ class Wheel_Manager_BME_Wheel_Integration {
         }
 
         $user_id = get_current_user_id();
+        
+        // Check if user has used the wheel in the last 24 hours
+        $last_spin = $this->get_last_spin_time($user_id);
+        if ($last_spin && (time() - strtotime($last_spin)) < 86400) { // 86400 seconds = 24 hours
+            error_log('Wheel Manager BME - User has used the wheel in the last 24 hours');
+            return;
+        }
+
         $available_points = (int)$this->mycred_integration->get_user_available_points($user_id);
         $min_points = (int)$this->min_points_for_spin;
         
@@ -96,6 +104,27 @@ class Wheel_Manager_BME_Wheel_Integration {
 
                     WOF.Dispatcher.subscribe('wof-after-display', function(wheel) {
                         console.log('Wheel Manager BME - Wheel after display event');
+                    });
+
+                    // Handle wheel closing
+                    function closeWheel() {
+                        console.log('Wheel Manager BME - Closing wheel');
+                        $('.wof-wheel, .wof-overlay, .wof-wheels').hide();
+                        // Record the close time
+                        $.ajax({
+                            url: ajaxurl,
+                            type: 'POST',
+                            data: {
+                                action: 'wheel_manager_bme_record_close',
+                                nonce: '<?php echo wp_create_nonce('wheel_manager_bme_close'); ?>'
+                            }
+                        });
+                    }
+
+                    // Add click handlers for close buttons
+                    $(document).on('click', '.wof-close, .wof-close-icon, .wof-btn-done, .wof-close-wrapper a', function(e) {
+                        e.preventDefault();
+                        closeWheel();
                     });
 
                     // Directly style the wheel elements
@@ -158,11 +187,6 @@ class Wheel_Manager_BME_Wheel_Integration {
                         subtree: true
                     });
 
-                    // Force wheel display on any click
-                    $(document).on('click', function() {
-                        applyWheelStyles();
-                    });
-
                     // Mark as initialized
                     window.wheelManagerBMEInitialized = true;
                 } else {
@@ -178,6 +202,57 @@ class Wheel_Manager_BME_Wheel_Integration {
             error_log('Wheel Manager BME - Points comparison: ' . $available_points . ' < ' . $min_points);
             error_log('Wheel Manager BME - Points difference: ' . ($min_points - $available_points) . ' points needed');
         }
+    }
+
+    /**
+     * Get the last time the user spun the wheel
+     */
+    private function get_last_spin_time($user_id) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'wheel_spin_history';
+        
+        $last_spin = $wpdb->get_var($wpdb->prepare(
+            "SELECT created_at FROM $table_name 
+            WHERE user_id = %d 
+            ORDER BY created_at DESC 
+            LIMIT 1",
+            $user_id
+        ));
+        
+        return $last_spin;
+    }
+
+    /**
+     * Record wheel close time
+     */
+    public function record_wheel_close() {
+        check_ajax_referer('wheel_manager_bme_close', 'nonce');
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+            return;
+        }
+
+        $user_id = get_current_user_id();
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'wheel_spin_history';
+        
+        $wpdb->insert(
+            $table_name,
+            array(
+                'user_id' => $user_id,
+                'wheel_id' => 0,
+                'points_used' => 0,
+                'original_prize' => 0,
+                'final_prize' => 0,
+                'multiplier' => 1,
+                'created_at' => current_time('mysql'),
+                'action' => 'close'
+            ),
+            array('%d', '%d', '%f', '%f', '%f', '%f', '%s', '%s')
+        );
+        
+        wp_send_json_success();
     }
 
     /**

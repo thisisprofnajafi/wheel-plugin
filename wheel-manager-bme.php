@@ -80,6 +80,13 @@ class Wheel_Manager_BME {
 
         // Enqueue frontend scripts
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
+
+        // Add AJAX handlers
+        add_action('wp_ajax_wheel_manager_bme_record_close', array($this->wheel_integration, 'record_wheel_close'));
+        add_action('wp_ajax_nopriv_wheel_manager_bme_record_close', array($this->wheel_integration, 'record_wheel_close'));
+
+        // Add settings link
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_settings_link'));
     }
 
     /**
@@ -227,6 +234,15 @@ class Wheel_Manager_BME {
             'nonce' => wp_create_nonce('wheel_manager_bme'),
             'user_id' => get_current_user_id()
         ));
+    }
+
+    /**
+     * Add settings link
+     */
+    public function add_settings_link($links) {
+        $settings_link = '<a href="admin.php?page=wheel-manager-bme-settings">' . __('Settings', 'wheel-manager-bme') . '</a>';
+        array_push($links, $settings_link);
+        return $links;
     }
 }
 
