@@ -616,18 +616,22 @@ class Wheel_Manager_BME_Admin_Dashboard {
         $spins = $wpdb->get_results(
             "SELECT 
                 o.email,
-                COUNT(*) as total_spins,
+                COUNT(CASE WHEN o.segment_text IS NOT NULL AND o.segment_text != '' THEN 1 END) as total_spins,
                 SUM(
                     CASE 
-                        WHEN o.segment_text REGEXP '^[0-9]+$' 
+                        WHEN o.segment_text IS NOT NULL 
+                        AND o.segment_text != '' 
+                        AND o.segment_text REGEXP '^[0-9]+$' 
                         THEN CAST(o.segment_text AS UNSIGNED)
                         ELSE 0 
                     END
                 ) as total_points_won,
-                MAX(o.created_date) as last_spin_time
+                MAX(CASE WHEN o.segment_text IS NOT NULL AND o.segment_text != '' THEN o.created_date END) as last_spin_time
             FROM {$wpdb->prefix}wof_optins o
-            
+            WHERE o.segment_text IS NOT NULL 
+            AND o.segment_text != ''
             GROUP BY o.email
+            HAVING total_spins > 0
             ORDER BY last_spin_time DESC"
         );
         
