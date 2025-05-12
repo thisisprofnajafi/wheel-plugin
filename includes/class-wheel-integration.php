@@ -85,8 +85,8 @@ class Wheel_Manager_BME_Wheel_Integration {
                     function applyWheelStyles() {
                         console.log('Wheel Manager BME - Applying wheel styles');
                         
-                        // Get wheel elements
-                        var $wheel = $('.wof-wheel');
+                        // Get wheel elements with specific data-id
+                        var $wheel = $('.wof-wheel[data-id="4785"]');
                         var $overlay = $('.wof-overlay');
                         var $wheels = $('.wof-wheels');
                         
@@ -102,7 +102,10 @@ class Wheel_Manager_BME_Wheel_Integration {
                                 'display': 'block',
                                 'transform': 'translateX(0%)',
                                 'opacity': '1',
-                                'visibility': 'visible'
+                                'visibility': 'visible',
+                                'background-color': '#4f4f4f',
+                                'position': 'relative',
+                                'z-index': '999999'
                             });
                         }
 
@@ -110,7 +113,14 @@ class Wheel_Manager_BME_Wheel_Integration {
                             $overlay.css({
                                 'display': 'block',
                                 'opacity': '1',
-                                'visibility': 'visible'
+                                'visibility': 'visible',
+                                'position': 'fixed',
+                                'top': '0',
+                                'left': '0',
+                                'right': '0',
+                                'bottom': '0',
+                                'background': 'rgba(0,0,0,0.5)',
+                                'z-index': '999998'
                             });
                         }
 
@@ -118,9 +128,25 @@ class Wheel_Manager_BME_Wheel_Integration {
                             $wheels.css({
                                 'display': 'block',
                                 'opacity': '1',
-                                'visibility': 'visible'
+                                'visibility': 'visible',
+                                'position': 'fixed',
+                                'top': '50%',
+                                'left': '50%',
+                                'transform': 'translate(-50%, -50%)',
+                                'z-index': '999999'
                             });
                         }
+
+                        // Force wheel to be visible
+                        $wheel.removeAttr('style').css({
+                            'display': 'block',
+                            'transform': 'translateX(0%)',
+                            'opacity': '1',
+                            'visibility': 'visible',
+                            'background-color': '#4f4f4f',
+                            'position': 'relative',
+                            'z-index': '999999'
+                        });
                     }
 
                     // Apply styles immediately
@@ -144,6 +170,11 @@ class Wheel_Manager_BME_Wheel_Integration {
                     observer.observe(document.body, {
                         childList: true,
                         subtree: true
+                    });
+
+                    // Force wheel display on any click
+                    $(document).on('click', function() {
+                        applyWheelStyles();
                     });
                 }
             });
