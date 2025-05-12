@@ -612,16 +612,19 @@ class Wheel_Manager_BME_Admin_Dashboard {
     public function display_wheel_history() {
         global $wpdb;
         
-        // Get all users who have spun the wheel
-        $users = $wpdb->get_results(
-            "SELECT DISTINCT email 
-            FROM {$wpdb->prefix}wof_optins 
-            ORDER BY created_date DESC"
+        // Get all spins with user information
+        $spins = $wpdb->get_results(
+            "SELECT 
+                o.email,
+                COUNT(*) as total_spins,
+                SUM(CAST(REGEXP_REPLACE(o.segment_text, '[^0-9]', '') AS UNSIGNED)) as total_points_won,
+                MAX(o.created_date) as last_spin_time
+            FROM {$wpdb->prefix}wof_optins o
+            GROUP BY o.email
+            ORDER BY last_spin_time DESC"
         );
         
         echo '<div class="wrap">';
-        echo '<h2>' . __('Wheel Spin History', 'wheel-manager-bme') . '</h2>';
-        
         echo '<table class="wp-list-table widefat fixed striped">';
         echo '<thead>';
         echo '<tr>';
@@ -629,22 +632,31 @@ class Wheel_Manager_BME_Admin_Dashboard {
         echo '<th>' . __('امتیازات چرخ شانس', 'wheel-manager-bme') . '</th>';
         echo '<th>' . __('امتیازات MyCred', 'wheel-manager-bme') . '</th>';
         echo '<th>' . __('امتیازات تعدیل شده', 'wheel-manager-bme') . '</th>';
-        echo '<th>' . __('تعداد چرخش/۲', 'wheel-manager-bme') . '</th>';
+        echo '<th>' . __('تعداد چرخش', 'wheel-manager-bme') . '</th>';
         echo '<th>' . __('آخرین چرخش', 'wheel-manager-bme') . '</th>';
         echo '</tr>';
         echo '</thead>';
         echo '<tbody>';
         
-        foreach ($users as $user_data) {
-            $wheel_history = $this->wheel_integration->get_user_wheel_history($user_data->email);
+        foreach ($spins as $spin) {
+            // Get user by email
+            $user = get_user_by('email', $spin->email);
+            if (!$user) continue;
+
+            // Get MyCred points
+            $mycred_points = mycred_get_users_balance($user->ID);
+            
+            // Calculate adjusted points (MyCred points minus points deducted for spins)
+            $points_deducted = ($spin->total_spins * 10) / 2;
+            $adjusted_points = $mycred_points - $points_deducted;
             
             echo '<tr>';
-            echo '<td>' . esc_html($user_data->email) . '</td>';
-            echo '<td>' . esc_html($wheel_history['total_points_won']) . '</td>';
-            echo '<td>' . esc_html($wheel_history['available_points']) . '</td>';
-            echo '<td>' . esc_html($wheel_history['adjusted_points']) . '</td>';
-            echo '<td>' . esc_html(number_format($wheel_history['total_spins'] / 2, 1)) . '</td>';
-            echo '<td>' . esc_html($wheel_history['last_spin_time']) . '</td>';
+            echo '<td>' . esc_html($spin->email) . '</td>';
+            echo '<td>' . esc_html($spin->total_points_won) . '</td>';
+            echo '<td>' . esc_html($mycred_points) . '</td>';
+            echo '<td>' . esc_html($adjusted_points) . '</td>';
+            echo '<td>' . esc_html($spin->total_spins) . '</td>';
+            echo '<td>' . esc_html($spin->last_spin_time) . '</td>';
             echo '</tr>';
         }
         
