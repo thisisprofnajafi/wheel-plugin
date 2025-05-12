@@ -81,21 +81,71 @@ class Wheel_Manager_BME_Wheel_Integration {
                         error_log('Wheel Manager BME - Wheel after display event');
                     });
 
-                    // Show wheel overlay
-                    $('.wof-overlay').show();
-                    
-                    // Show wheel container
-                    $('.wof-wheels').show();
-                }
+                    // Directly style the wheel elements
+                    function applyWheelStyles() {
+                        console.log('Wheel Manager BME - Applying wheel styles');
+                        
+                        // Get wheel elements
+                        var $wheel = $('.wof-wheel');
+                        var $overlay = $('.wof-overlay');
+                        var $wheels = $('.wof-wheels');
+                        
+                        console.log('Wheel Manager BME - Found elements:', {
+                            wheel: $wheel.length,
+                            overlay: $overlay.length,
+                            wheels: $wheels.length
+                        });
 
-                // Add custom CSS for wheel visibility
-                $('<style>')
-                    .text(`
-                        .wof-wheel { display: block !important; transform: translateX(0%) !important; }
-                        .wof-overlay { display: block !important; }
-                        .wof-wheels { display: block !important; }
-                    `)
-                    .appendTo('head');
+                        // Apply styles directly to elements
+                        if ($wheel.length) {
+                            $wheel.css({
+                                'display': 'block',
+                                'transform': 'translateX(0%)',
+                                'opacity': '1',
+                                'visibility': 'visible'
+                            });
+                        }
+
+                        if ($overlay.length) {
+                            $overlay.css({
+                                'display': 'block',
+                                'opacity': '1',
+                                'visibility': 'visible'
+                            });
+                        }
+
+                        if ($wheels.length) {
+                            $wheels.css({
+                                'display': 'block',
+                                'opacity': '1',
+                                'visibility': 'visible'
+                            });
+                        }
+                    }
+
+                    // Apply styles immediately
+                    applyWheelStyles();
+
+                    // Also apply styles after a short delay to ensure elements are in DOM
+                    setTimeout(applyWheelStyles, 100);
+                    setTimeout(applyWheelStyles, 500);
+                    setTimeout(applyWheelStyles, 1000);
+
+                    // Watch for dynamic changes
+                    var observer = new MutationObserver(function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            if (mutation.addedNodes.length) {
+                                applyWheelStyles();
+                            }
+                        });
+                    });
+
+                    // Start observing the document body for changes
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
             });
             </script>
             <?php
