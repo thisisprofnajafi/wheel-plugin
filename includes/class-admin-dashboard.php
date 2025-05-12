@@ -626,8 +626,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
                 ) as total_points_won,
                 MAX(o.created_date) as last_spin_time
             FROM {$wpdb->prefix}wof_optins o
-            WHERE o.segment_text != '' 
-            AND o.segment_text IS NOT NULL
+            WHERE o.segment_text IS NOT NULL 
             GROUP BY o.email
             HAVING total_spins > 0
             ORDER BY last_spin_time DESC"
@@ -656,7 +655,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
             $mycred_points = mycred_get_users_balance($user->ID);
             
             // Calculate adjusted points (MyCred points minus points deducted for spins)
-            $points_deducted = ($spin->total_spins * 10);
+            $points_deducted = ($spin->total_spins * 10) / 2;
             $adjusted_points = max(0, $mycred_points - $points_deducted);
             
             // Format the last spin time
