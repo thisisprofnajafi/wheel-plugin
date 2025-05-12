@@ -133,23 +133,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
         ?>
         <div class="wrap">
             <h1>داشبورد مدیریت چرخ شانس</h1>
-            
-            <div class="wheel-manager-stats">
-                <div class="stat-box" data-stat="total_spins">
-                    <h3>تعداد کل چرخش‌ها</h3>
-                    <p><?php echo $this->get_total_spins(); ?></p>
-                </div>
-                
-                <div class="stat-box" data-stat="total_points">
-                    <h3>مجموع امتیازات اهدا شده</h3>
-                    <p><?php echo $this->get_total_points_awarded(); ?></p>
-                </div>
-                
-                <div class="stat-box" data-stat="active_users">
-                    <h3>کاربران فعال</h3>
-                    <p><?php echo $this->get_active_users_count(); ?></p>
-                </div>
-            </div>
+        
 
             <div class="wheel-manager-recent">
                 <h2>تاریخچه چرخش‌ها</h2>
