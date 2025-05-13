@@ -641,7 +641,7 @@ class Wheel_Manager_BME_Admin_Dashboard {
             $mycred_points = mycred_get_users_balance($user->ID);
             
             // Calculate adjusted points (MyCred points minus points deducted for spins)
-            $points_deducted = ($spin->total_spins * 10);
+            $points_deducted = ($spin->total_spins * 100);
             $adjusted_points = max(0, $mycred_points - $points_deducted);
             
             // Format the last spin time

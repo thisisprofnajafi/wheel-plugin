@@ -10,9 +10,9 @@ if (!defined('ABSPATH')) {
 class Wheel_Manager_BME_Wheel_Integration {
     private static $instance = null;
     private $mycred_integration;
-    private $min_points_for_spin = 10;
-    private $points_for_six_spins = 50;
-    private $points_for_fifteen_spins = 100;
+    private $min_points_for_spin = 1000;
+    private $points_for_six_spins = 5000;
+    private $points_for_fifteen_spins = 10000;
 
     public static function get_instance() {
         if (null === self::$instance) {
@@ -62,7 +62,7 @@ class Wheel_Manager_BME_Wheel_Integration {
                 'last_spin_time' => null,
                 'can_spin' => false,
                 'available_points' => 0,
-                'points_needed' => 10,
+                'points_needed' => 1000,
                 'adjusted_points' => 0
             );
         }
@@ -95,7 +95,7 @@ class Wheel_Manager_BME_Wheel_Integration {
         $available_points = $this->mycred_integration->get_user_available_points($user_id);
         
         // Calculate adjusted points (remove 10 points per spin divided by 2)
-        $points_deducted = ($total_spins * 10) / 2;
+        $points_deducted = ($total_spins * 1000) / 2;
         $adjusted_points = $available_points - $points_deducted;
         
         // Calculate if user can spin
@@ -107,7 +107,7 @@ class Wheel_Manager_BME_Wheel_Integration {
         }
         
         // Check if user has enough points (10 points per spin)
-        $points_needed = 10;
+        $points_needed = 1000;
         if ($adjusted_points < $points_needed) {
             $can_spin = false;
         }
