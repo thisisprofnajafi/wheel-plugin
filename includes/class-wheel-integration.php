@@ -97,7 +97,7 @@ class Wheel_Manager_BME_Wheel_Integration {
         // Calculate adjusted points (remove 10 points per spin divided by 2)
         $points_deducted = ($total_spins * 1000) / 2;
         $adjusted_points = $available_points - $points_deducted;
-        
+        error_log('Wheel Manager BME - points_deducted $points_deducted}');
         // Calculate if user can spin
         $can_spin = true;
         
